@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Редактировать Вопрос{% endblock %}
+
+{% block content %}
+    <div class="panel">
+        <div class="panel-header text-center">
+            <div class="panel-title h5 mt-10">Редактировать Вопрос для "{{ quiz_pack.title }}"</div>
+        </div>
+        <div class="panel-body">
+            <form action="{{ url_for('admin_edit_question', question_id=question.id) }}" method="POST" class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="question_text">Текст вопроса</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <textarea class="form-input" id="question_text" name="question_text" required>{{ question.question_text }}</textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="image_url">URL картинки (необязательно)</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <input class="form-input" type="text" id="image_url" name="image_url" value="{{ question.image_url if question.image_url else '' }}" placeholder="Например, /static/img/HarryPotter/1pack/вопрос1.jpg">
+                        <p class="form-input-hint">Используйте URL картинки. Для локальных картинок: /static/ваш_файл.jpg</p>
+                    </div>
+                </div>
+                <div class="divider text-center" data-content="Варианты Ответов"></div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="option_A">Вариант A</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <input class="form-input" type="text" id="option_A" name="option_A" value="{{ current_options['A'] }}" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="option_B">Вариант B</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <input class="form-input" type="text" id="option_B" name="option_B" value="{{ current_options['B'] }}" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="option_C">Вариант C</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <input class="form-input" type="text" id="option_C" name="option_C" value="{{ current_options['C'] }}" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="option_D">Вариант D</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <input class="form-input" type="text" id="option_D" name="option_D" value="{{ current_options['D'] }}" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="correct_answer">Правильный ответ (A, B, C, D)</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <input class="form-input" type="text" id="correct_answer" name="correct_answer" pattern="[ABCD]" title="Введите A, B, C или D" value="{{ question.correct_answer }}" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="panel-footer text-center">
+            <a href="{{ url_for('admin_add_question', quiz_id=quiz_pack.id) }}">Вернуться к вопросам квиз-пака</a>
+        </div>
+    </div>
+{% endblock %}

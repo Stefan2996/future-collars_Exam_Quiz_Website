@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Моя Статистика{% endblock %}
+
+{% block content %}
+    <div class="panel">
+        <div class="panel-header text-center">
+            <div class="panel-title h5 mt-10">Профиль пользователя: {{ user.username }}</div>
+        </div>
+        <div class="panel-body">
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Общая статистика:</strong></p>
+            <p>Правильных ответов: {{ user.total_correct_answers }}</p>
+            <p>Всего вопросов: {{ user.total_questions_attempted }}</p>
+            <p>Процент точности: {{ "%.2f"|format(user.total_correct_answers / user.total_questions_attempted * 100) if user.total_questions_attempted > 0 else 0 }}%</p>
+
+            <h6 class="mt-4">Статистика по квизам:</h6>
+            {% if quiz_stats %}
+                <ul class="list-group">
+                    {% for stat in quiz_stats %}
+                        <li class="list-group-item">
+                            {# Используем новые поля: total_correct и total_questions #}
+                            <strong>{{ quiz_pack_titles[stat.quiz_pack_id] }}:</strong> {{ stat.total_correct }} из {{ stat.total_questions }} ({{ "%.2f"|format(stat.total_correct / stat.total_questions * 100) if stat.total_questions > 0 else 0 }}%)
+                            <br><small>Сыграно раз: {{ stat.games_played }}</small> {# Добавим отображение количества сыгранных раз #}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Вы ещё не проходили ни одного квиза.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

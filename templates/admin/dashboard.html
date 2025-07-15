@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Админ-панель{% endblock %}
+
+{% block content %}
+    <div class="panel">
+        <div class="panel-header text-center">
+            <div class="panel-title h5 mt-10">Управление Квиз-Паками</div>
+        </div>
+        <div class="panel-body">
+            <a href="{{ url_for('admin_new_quiz_pack') }}" class="btn btn-primary mb-2">Создать новый квиз-пак</a>
+            
+            {% if quiz_packs %}
+                <ul class="list-group">
+                    {% for pack in quiz_packs %}
+                        <li class="list-group-item">
+                            <div class="tile tile-centered">
+                                <div class="tile-content">
+                                    <p class="tile-title h6">{{ pack.title }}</p>
+                                    <p class="tile-subtitle">{{ pack.description }}</p>
+                                    <small>Вопросов: {{ pack.questions|length }}</small>
+                                </div>
+                                <div class="tile-action">
+                                    <a href="{{ url_for('admin_add_question', quiz_id=pack.id) }}" class="btn btn-primary btn-sm">Добавить вопрос</a>
+                                    <a href="{{ url_for('admin_edit_quiz_pack', quiz_id=pack.id) }}" class="btn btn-link btn-sm">Редактировать</a>
+                                    <form action="{{ url_for('admin_delete_quiz_pack', quiz_id=pack.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Вы уверены, что хотите удалить квиз-пак &quot;{{ pack.title }}&quot; и все его вопросы/статистику?');">
+                                        <button type="submit" class="btn btn-error btn-sm">Удалить</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-center">Пока нет созданных квиз-паков.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

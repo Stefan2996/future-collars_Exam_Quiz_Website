@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Новый Квиз-Пак{% endblock %}
+
+{% block content %}
+    <div class="panel">
+        <div class="panel-header text-center">
+            <div class="panel-title h5 mt-10">Создать новый Квиз-Пак</div>
+        </div>
+        <div class="panel-body">
+            <form action="{{ url_for('admin_new_quiz_pack') }}" method="POST" class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="title">Название квиз-пака</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <input class="form-input" type="text" id="title" name="title" placeholder="Например, 'Гарри Поттер: Часть 1'" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="description">Описание</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <textarea class="form-input" id="description" name="description" placeholder="Краткое описание квиза (необязательно)"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-primary">Создать</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="panel-footer text-center">
+            <a href="{{ url_for('admin_dashboard') }}">Вернуться к админ-панели</a>
+        </div>
+    </div>
+{% endblock %}

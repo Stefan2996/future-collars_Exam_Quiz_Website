@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Сводка Квиза{% endblock %}
+
+{% block content %}
+    <div class="panel">
+        <div class="panel-header text-center">
+            <div class="panel-title h5 mt-10">Сводка Квиза "{{ quiz_pack_title }}"</div>
+        </div>
+        <div class="panel-body text-center">
+            <p class="h4">Вы ответили правильно на {{ correct_count }} из {{ total_questions }} вопросов!</p>
+            {% set percentage = (correct_count / total_questions * 100) if total_questions > 0 else 0 %}
+            <p class="h5">Ваш процент правильных ответов: {{ "%.2f"|format(percentage) }}%</p>
+
+            <div class="divider text-center" data-content="Ваши Ответы"></div>
+
+            {% if quiz_history %}
+                {% for item in quiz_history %}
+                    <div class="card my-2 {% if item.is_correct %}bg-success{% else %}bg-error{% endif %}">
+                        <div class="card-header">
+                            <div class="card-title h6">Вопрос {{ loop.index }}:</div>
+                            <div class="card-subtitle">{{ item.question_text }}</div>
+                        </div>
+                        <div class="card-body">
+                            {% if item.image_url %}
+                                <div class="text-center my-1">
+                                    <img src="{{ item.image_url }}" alt="Изображение к вопросу" class="img-responsive" style="max-height: 150px; object-fit: contain;">
+                                </div>
+                            {% endif %}
+                            <p>Ваш ответ: **{{ item.user_answer_key }}. {{ item.user_answer_text }}**</p>
+                            <p class="text-bold">Правильный ответ: **{{ item.correct_answer_key }}. {{ item.correct_answer_text }}**</p>
+                            <p>Результат: <span class="label {% if item.is_correct %}label-success{% else %}label-error{% endif %}">
+                                {% if item.is_correct %}Верно{% else %}Неверно{% endif %}
+                            </span></p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>История ответов недоступна.</p>
+            {% endif %}
+
+            <div class="mt-4">
+                <a href="{{ url_for('quiz_list') }}" class="btn btn-primary btn-lg">Вернуться к списку квизов</a>
+                <a href="{{ url_for('index') }}" class="btn btn-link btn-lg">На главную</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

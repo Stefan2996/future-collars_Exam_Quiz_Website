@@ -1,0 +1,114 @@
+/* Общие стили */
+body {
+    background-color: #f8f9fa; /* Светлый фон */
+    font-family: 'Arial', sans-serif; /* Простой шрифт */
+    color: #343a40; /* Темный текст */
+}
+
+.panel {
+    background-color: #ffffff; /* Белый фон для панелей/карточек */
+    border-radius: 8px; /* Скругленные углы */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Легкая тень */
+    padding: 20px;
+}
+
+.panel-header {
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.panel-title {
+    color: #007bff; /* Цвет заголовков, соответствующий кнопкам */
+    font-weight: bold;
+}
+
+/* Стили для карточек квизов */
+.card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.card-header {
+    background-color: #f0f0f0; /* Более светлый фон для заголовка карточки */
+    padding: 15px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.card-title {
+    margin-bottom: 0;
+    color: #333; /* Более темный текст для заголовка карточки */
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-text {
+    color: #555;
+}
+
+.quiz-stats-summary {
+    background-color: #e9f7ef; /* Легкий зеленый фон для статистики */
+    border-left: 5px solid #28a745; /* Зеленая полоса слева */
+    padding: 10px 15px;
+    margin-top: 15px;
+    border-radius: 4px;
+}
+
+.quiz-stats-summary p {
+    margin-bottom: 5px;
+    font-size: 0.95em;
+}
+
+.quiz-stats-summary strong {
+    color: #28a745; /* Зеленый для выделения чисел */
+}
+
+.card-footer {
+    background-color: #f9f9f9;
+    padding: 15px 20px;
+    border-top: 1px solid #e0e0e0;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.btn-primary {
+    background-color: #007bff; /* Синий цвет для кнопок */
+    border-color: #007bff;
+    transition: background-color 0.2s ease; /* Плавный переход при наведении */
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+/* Адаптивные стили */
+@media (max-width: 768px) {
+    .panel, .card {
+        padding: 15px;
+    }
+    .card-header, .card-body, .card-footer {
+        padding: 10px 15px;
+    }
+}
+
+/* Стили для изображений квизов */
+.quiz-image-container {
+    width: 100%; /* Занимает всю ширину контейнера */
+    height: 180px; /* Фиксированная высота для единообразия */
+    overflow: hidden; /* Обрезаем, если изображение выходит за границы */
+    margin-bottom: 15px; /* Отступ снизу */
+    border-radius: 4px; /* Слегка скругленные углы */
+}
+
+.quiz-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Изображение будет обрезаться, чтобы заполнить контейнер без искажений */
+    display: block; /* Убираем лишний пробел под изображением */
+}

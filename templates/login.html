@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Вход{% endblock %}
+
+{% block content %}
+    <div class="panel">
+        <div class="panel-header text-center">
+            <div class="panel-title h5 mt-10">Вход в аккаунт</div>
+        </div>
+        <div class="panel-body">
+            <form action="{{ url_for('login') }}" method="POST" class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="username">Имя пользователя</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <input class="form-input" type="text" id="username" name="username" placeholder="Ваш логин" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="password">Пароль</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <input class="form-input" type="password" id="password" name="password" placeholder="Ваш пароль" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-primary">Войти</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="panel-footer text-center">
+            Нет аккаунта? <a href="{{ url_for('register') }}">Зарегистрироваться</a>
+        </div>
+    </div>
+{% endblock %}

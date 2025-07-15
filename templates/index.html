@@ -1,10 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+    <div class="panel">
+        <div class="panel-header text-center">
+            <div class="panel-title h5 mt-10">Добро пожаловать в Quiz App!</div>
+        </div>
+        <div class="panel-body text-center">
+            {% if logged_in and user %}
+                <p class="h4">Привет, {{ user.username }}!</p>
+                {# Проверяем user.total_questions_attempted, чтобы избежать деления на ноль #}
+                {% if user.total_questions_attempted > 0 %}
+                    <p>Ваша общая статистика: {{ "%.2f"|format(user.total_correct_answers / user.total_questions_attempted * 100) }}% правильных ответов.</p>
+                {% else %}
+                    <p>Вы еще не проходили квизы. Попробуйте один!</p>
+                {% endif %}
+            {% else %}
+                <p class="h4">Пожалуйста, войдите или зарегистрируйтесь, чтобы начать играть.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

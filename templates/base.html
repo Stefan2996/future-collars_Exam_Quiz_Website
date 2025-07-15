@@ -1,10 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Quiz App{% endblock %}</title>
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <header class="navbar">
+        <section class="navbar-section">
+            <a href="{{ url_for('index') }}" class="btn btn-link">Главная</a>
+            {% if logged_in %}
+                <a href="{{ url_for('quiz_list') }}" class="btn btn-link">Квизы</a>
+                <a href="{{ url_for('user_stats') }}" class="btn btn-link">Моя статистика</a>
+            {% endif %}
+        </section>
+        <section class="navbar-center">
+            <a href="{{ url_for('index') }}" class="navbar-brand mr-2">Quiz Platform</a>
+        </section>
+        <section class="navbar-section">
+            {% if logged_in %}
+                <span class="btn btn-link">Привет, {{ user.username }}!</span>
+                <a href="{{ url_for('logout') }}" class="btn btn-link">Выйти</a>
+            {% else %}
+                <a href="{{ url_for('register') }}" class="btn btn-link">Регистрация</a>
+                <a href="{{ url_for('login') }}" class="btn btn-link">Войти</a>
+            {% endif %}
+        </section>
+    </header>
 
+    <div class="container grid-lg">
+        <div class="columns">
+            <div class="column col-8 col-mx-auto py-2">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="toast toast-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center py-2">
+        <p>&copy; 2025 Quiz App by Stepan. Все права защищены.</p>
+    </footer>
 </body>
 </html>
