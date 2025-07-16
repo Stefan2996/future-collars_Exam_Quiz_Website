@@ -1,39 +1,43 @@
 {% extends "base.html" %}
 
-{% block title %}Вход{% endblock %}
+{% block title %}Вход - QuizMaster{% endblock %}
 
 {% block content %}
-    <div class="panel">
-        <div class="panel-header text-center">
-            <div class="panel-title h5 mt-10">Вход в аккаунт</div>
-        </div>
-        <div class="panel-body">
-            <form action="{{ url_for('login') }}" method="POST" class="form-horizontal">
+<div class="auth-bg">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h2>Вход в QuizMaster</h2>
+                <p>Введите свои данные для входа в аккаунт</p>
+            </div>
+
+            <form method="POST" class="auth-form">
                 <div class="form-group">
-                    <div class="col-3 col-sm-12">
-                        <label class="form-label" for="username">Имя пользователя</label>
-                    </div>
-                    <div class="col-9 col-sm-12">
-                        <input class="form-input" type="text" id="username" name="username" placeholder="Ваш логин" required>
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Пароль</label>
+                    <div class="password-input">
+                        <input type="password" id="password" name="password" placeholder="Введите пароль" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                            <i class="fas fa-eye"></i>
+                        </button>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-3 col-sm-12">
-                        <label class="form-label" for="password">Пароль</label>
-                    </div>
-                    <div class="col-9 col-sm-12">
-                        <input class="form-input" type="password" id="password" name="password" placeholder="Ваш пароль" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary">Войти</button>
-                    </div>
-                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">Войти</button>
             </form>
-        </div>
-        <div class="panel-footer text-center">
-            Нет аккаунта? <a href="{{ url_for('register') }}">Зарегистрироваться</a>
+
+            <div class="auth-footer">
+                <p>Нет аккаунта? <a href="{{ url_for('register') }}">Зарегистрироваться</a></p>
+                <a href="{{ url_for('index') }}" class="back-link">← Вернуться на главную</a>
+            </div>
         </div>
     </div>
+</div>
 {% endblock %}

@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Профиль - QuizMaster{% endblock %}
+
+{# Здесь мы полностью переопределяем блок 'header' из base.html #}
+{% block header %}
+<header class="header header-compact-padding">
+    <div class="container">
+        <div class="header-content">
+            <a href="{{ url_for('packs') }}" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                Назад к пакам
+            </a>
+            <div class="quiz-title">
+                <i class="fas fa-brain"></i>
+                <span>Профиль</span>
+            </div>
+        </div>
+    </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<div class="profile-bg">
+    <div class="profile-container">
+        <div class="profile-card">
+            <div class="user-info">
+                <div class="user-avatar">
+                    {# Тут вам нужно будет передать 'user' в шаблон, если вы хотите показывать user.name[0] #}
+                    {# Если user не передается, то можно убрать эту строку или использовать заглушку #}
+                    {{ g.user.name[0]|upper if g.user else '?' }}
+                </div>
+                <div class="user-details">
+                    <h2>{{ g.user.name if g.user else 'Гость' }}</h2> {# Используем g.user, так как он доступен #}
+                    <p><i class="fas fa-envelope"></i> {{ g.user.email if g.user else 'N/A' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card blue">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Правильных ответов</h3>
+                    {# ИСМЕНЕНО ЗДЕСЬ #}
+                    <p class="stat-number">{{ correct_answers }}</p>
+                </div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-icon">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Всего вопросов</h3>
+                    {# ИСМЕНЕНО ЗДЕСЬ #}
+                    <p class="stat-number">{{ total_questions }}</p>
+                </div>
+            </div>
+            <div class="stat-card purple">
+                <div class="stat-icon">
+                    <i class="fas fa-percentage"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Процент верных</h3>
+                    <p class="stat-number">
+                        {# ИСМЕНЕНО ЗДЕСЬ #}
+                        {% if total_questions > 0 %}
+                            {{ "%.1f" | format((correct_answers / total_questions) * 100) }}%
+                        {% else %}
+                            0.0%
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="pack-stats-card">
+            <div class="card-header">
+                <h3>Статистика по пакам</h3>
+                <p>Ваш прогресс по каждому паку вопросов.</p>
+            </div>
+            {% if pack_stats %}
+                {% for pack_id, pack_stat in pack_stats.items() %} {# ИСМЕНЕНО: pack_stats - это словарь #}
+                <div class="pack-stat-item">
+                    <div class="pack-stat-header">
+                        <h4>{{ pack_stat.pack_title }}</h4>
+                        <span class="attempts-badge">Попыток: {{ pack_stat.attempts }}</span>
+                    </div>
+                    <div class="pack-stat-details">
+                        <div class="stat-detail">
+                            <span class="label">Лучший счет:</span>
+                            <span class="value">{{ pack_stat.best_score }}</span>
+                        </div>
+                        <div class="stat-detail">
+                            <span class="label">Последний счет:</span>
+                            <span class="value">{{ pack_stat.last_score }}</span>
+                        </div>
+                        <div class="stat-detail">
+                            <span class="label">Всего вопросов в паке:</span>
+                            <span class="value">{{ pack_stat.total_questions }}</span>
+                        </div>
+                        <div class="stat-detail">
+                            <span class="label">Процент лучшего:</span>
+                            <span class="value">
+                                {# Используем best_score и total_questions из pack_stat #}
+                                {% if pack_stat.total_questions > 0 %}
+                                    {{ "%.1f" | format((pack_stat.best_score / pack_stat.total_questions) * 100) }}%
+                                {% else %}
+                                    0.0%
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="stat-detail">
+                            <span class="label">Процент последнего:</span>
+                            <span class="value">
+                                {# Используем last_score и total_questions из pack_stat #}
+                                {% if pack_stat.total_questions > 0 %}
+                                    {{ "%.1f" | format((pack_stat.last_score / pack_stat.total_questions) * 100) }}%
+                                {% else %}
+                                    0.0%
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="progress-bar small">
+                        {# Прогресс-бар лучше строить по лучшему или последнему результату #}
+                        <div class="progress-fill" style="width: {{ "%.1f" | format((pack_stat.best_score / pack_stat.total_questions) * 100) if pack_stat.total_questions > 0 else 0 }}%;"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-chart-line"></i>
+                    <p>Пока нет статистики по пакам. Начните проходить квизы!</p>
+                    <a href="{{ url_for('packs') }}" class="btn btn-primary">Найти паки</a>
+                </div>
+            {% endif %}
+        </div>
+
+        {# Если у вас есть достижения, вам нужно будет также адаптировать их под ваши переменные #}
+        <div class="achievements-card">
+            <div class="card-header">
+                <h3>Ваши достижения</h3>
+                <p>Награды за ваши успехи в квизах.</p>
+            </div>
+            <div class="achievements-grid">
+                {# Предположим, что вы передаете список user_achievements #}
+                {% if user_achievements %} {# Вам нужно будет передавать user_achievements из app.py #}
+                    {% for achievement in user_achievements %}
+                    <div class="achievement {% if achievement.unlocked %}unlocked{% endif %}">
+                        <i class="{{ achievement.icon }}"></i>
+                        <div class="achievement-info">
+                            <h4>{{ achievement.title }}</h4>
+                            <p>{{ achievement.description }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-medal"></i>
+                        <p>Вы пока не получили ни одного достижения. Проходите квизы, чтобы их разблокировать!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

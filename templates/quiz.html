@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}{{ pack.title }} - QuizMaster{% endblock %}
+
+{% block header %}
+<header class="header header-compact-padding">
+    <div class="container">
+        <div class="header-content">
+            <a href="{{ url_for('packs') }}" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                Назад к пакам
+            </a>
+            <div class="quiz-title">
+                <i class="fas fa-brain"></i>
+                <span>{{ pack.title }}</span>
+            </div>
+        </div>
+    </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<div class="quiz-bg">
+    <div class="quiz-container">
+        <div class="quiz-progress">
+            <div class="progress-info">
+                {# Эти значения будут обновляться JavaScript-ом #}
+                <span id="question-counter">Вопрос 1 из {{ total_questions }}</span>
+                <span id="progress-percentage">Прогресс: 0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 0%;"></div>
+            </div>
+        </div>
+
+        <div class="quiz-card">
+            <div class="question-header">
+                <h2 id="question-text"></h2> {# Текст вопроса будет вставляться сюда JS #}
+            </div>
+            <div class="answers-container" id="answers-container">
+                {# Варианты ответов будут динамически вставляться сюда JS #}
+            </div>
+            {# Это скрытое поле для хранения ВЫБРАННОГО ответа ТЕКУЩЕГО вопроса #}
+            <input type="hidden" name="selected_answer" id="selected-answer-input">
+
+            {# Кнопка для перехода к следующему вопросу или завершения квиза #}
+            <button type="button" class="btn btn-primary btn-full" id="next-question-btn" disabled>
+                Следующий вопрос
+            </button>
+            {# Если нужна отдельная кнопка "Завершить квиз", она пока скрыта #}
+            <button type="button" class="btn btn-secondary btn-full mt-4" id="finish-quiz-btn" style="display: none;">
+                Завершить квиз (резерв)
+            </button>
+        </div>
+    </div>
+</div>
+
+{# Скрытый скрипт-тег для передачи данных вопросов в JavaScript.
+   'safe' используется, чтобы Jinja2 не экранировал кавычки в JSON-строке. #}
+<script id="quiz-data" type="application/json">
+    {{ questions_data_json | safe }}
+</script>
+
+{% endblock %}

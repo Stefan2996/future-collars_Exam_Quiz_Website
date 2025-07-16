@@ -1,24 +1,70 @@
 {% extends "base.html" %}
 
-{% block title %}Главная{% endblock %}
-
 {% block content %}
-    <div class="panel">
-        <div class="panel-header text-center">
-            <div class="panel-title h5 mt-10">Добро пожаловать в Quiz App!</div>
+<div class="hero-bg">
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Проверь свои знания с
+                    <span class="gradient-text">QuizMaster</span>
+                </h1>
+                <p class="hero-description">
+                    Увлекательные квизы по различным темам. Соревнуйся с друзьями, отслеживай прогресс и становись экспертом!
+                </p>
+                <div class="hero-buttons">
+                    <a href="{{ url_for('packs') }}" class="btn btn-primary btn-large">
+                        <i class="fas fa-bolt"></i>
+                        Начать игру
+                    </a>
+                    {% if not g.user %} {# <-- НОВОЕ УСЛОВИЕ: Показать кнопку "Создать аккаунт", только если пользователь НЕ залогинен #}
+                    <a href="{{ url_for('register') }}" class="btn btn-outline btn-large">
+                        Создать аккаунт
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        <div class="panel-body text-center">
-            {% if logged_in and user %}
-                <p class="h4">Привет, {{ user.username }}!</p>
-                {# Проверяем user.total_questions_attempted, чтобы избежать деления на ноль #}
-                {% if user.total_questions_attempted > 0 %}
-                    <p>Ваша общая статистика: {{ "%.2f"|format(user.total_correct_answers / user.total_questions_attempted * 100) }}% правильных ответов.</p>
-                {% else %}
-                    <p>Вы еще не проходили квизы. Попробуйте один!</p>
-                {% endif %}
-            {% else %}
-                <p class="h4">Пожалуйста, войдите или зарегистрируйтесь, чтобы начать играть.</p>
-            {% endif %}
+    </section>
+
+    <section class="features">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon purple">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>Разнообразные темы</h3>
+                    <p>История, наука, спорт, культура и многое другое. Найди свою любимую тему!</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon blue">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3>Система достижений</h3>
+                    <p>Отслеживай свой прогресс, получай награды и поднимайся в рейтинге.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon green">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Соревнования</h3>
+                    <p>Соревнуйся с друзьями и другими игроками со всего мира.</p>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
+
+    <section class="cta">
+        <div class="container">
+            <div class="cta-card">
+                <h2>Готов принять вызов?</h2>
+                <p>Присоединяйся к тысячам игроков уже сейчас!</p>
+                <a href="{{ url_for('register') }}" class="btn btn-secondary btn-large">
+                    Начать бесплатно
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
 {% endblock %}

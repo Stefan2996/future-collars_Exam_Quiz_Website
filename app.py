@@ -1,45 +1,55 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, g
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash  # Для хеширования паролей
+from sqlalchemy import func
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 import os
-import json  # Для хранения answer_options как JSON строки
+import json
 import random
 
 app = Flask(__name__)
 
 # --- КОНФИГУРАЦИЯ БАЗЫ ДАННЫХ ---
-database_path = os.path.join(app.root_path, 'quiz_app.db')  # Новое имя для базы данных
+database_path = os.path.join(app.root_path, 'quiz_app.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{database_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = 'your_super_secret_key_for_quiz_app_change_me!'  # Очень важный секретный ключ
+app.secret_key = 'your_super_secret_key_for_quiz_app_change_me!'  # ОБЯЗАТЕЛЬНО ИЗМЕНИТЕ ЭТОТ КЛЮЧ!
 
 db = SQLAlchemy(app)
 
-# Регистрируем функцию chr() как Jinja2 фильтр
+# Регистрируем функцию chr() как Jinja2 фильтр (для букв A, B, C...)
 app.jinja_env.filters['chr'] = chr
+
+
+# Jinja2 фильтр для преобразования в JSON (используется в quiz.html)
+def tojson_filter(data):
+    return json.dumps(data)
+
+
+app.jinja_env.filters['tojsonfilter'] = tojson_filter
 
 
 # --- ОПРЕДЕЛЕНИЕ МОДЕЛЕЙ БАЗЫ ДАННЫХ ---
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
+    name = db.Column(db.String(80), unique=False, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
-    total_correct_answers = db.Column(db.Integer, default=0)
-    total_questions_attempted = db.Column(db.Integer, default=0)
+    registered_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    # Связь с UserQuizStat
     quiz_stats = db.relationship('UserQuizStat', backref='user', lazy=True)
 
     def set_password(self, password):
+        # ВОССТАНОВЛЕНО: Хеширование пароля для безопасности
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
+        # ВОССТАНОВЛЕНО: Проверка хешированного пароля
         return check_password_hash(self.password_hash, password)
 
     def __repr__(self):
-        return f'<User {self.username}>'
+        return f'<User {self.name}>'
 
 
 class QuizPack(db.Model):
@@ -47,8 +57,9 @@ class QuizPack(db.Model):
     title = db.Column(db.String(100), unique=True, nullable=False)
     description = db.Column(db.String(500), nullable=True)
     image_url = db.Column(db.String(200), nullable=True)
+    color = db.Column(db.String(20), default='blue')
+    difficulty = db.Column(db.String(20), default='Легкий')
 
-    # Связи
     questions = db.relationship('Question', backref='quiz_pack', lazy=True)
     user_stats = db.relationship('UserQuizStat', backref='quiz_pack', lazy=True)
 
@@ -60,14 +71,12 @@ class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     quiz_pack_id = db.Column(db.Integer, db.ForeignKey('quiz_pack.id'), nullable=False)
     question_text = db.Column(db.String(500), nullable=False)
-    # Храним варианты ответов как JSON строку
-    # Пример: '{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}'
-    answer_options_json = db.Column(db.String(1000), nullable=False)
-    correct_answer = db.Column(db.String(1), nullable=False)  # 'A', 'B', 'C', 'D'
+    options_json = db.Column(db.String(1000), nullable=False)
+    correct_answer_index = db.Column(db.Integer, nullable=False)
     image_url = db.Column(db.String(200), nullable=True)
 
-    def get_answer_options(self):
-        return json.loads(self.answer_options_json)
+    def get_options(self):
+        return json.loads(self.options_json)
 
     def __repr__(self):
         return f'<Question {self.id} for {self.quiz_pack.title}>'
@@ -77,21 +86,19 @@ class UserQuizStat(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     quiz_pack_id = db.Column(db.Integer, db.ForeignKey('quiz_pack.id'), nullable=False)
-    correct_answers_in_quiz = db.Column(db.Integer, default=0)
-    questions_attempted_in_quiz = db.Column(db.Integer, default=0)
     games_played = db.Column(db.Integer, default=0)
     total_correct = db.Column(db.Integer, default=0)
     total_questions = db.Column(db.Integer, default=0)
+    last_score = db.Column(db.Integer, default=0)
+    best_score = db.Column(db.Integer, default=0)
 
-    # Уникальная комбинация пользователя и квиза, чтобы не было дубликатов статистики
     __table_args__ = (db.UniqueConstraint('user_id', 'quiz_pack_id', name='_user_quiz_uc'),)
 
     def __repr__(self):
-        return f'<UserQuizStat User:{self.user_id} Quiz:{self.quiz_pack_id} Correct:{self.correct_answers_in_quiz}>'
+        return f'<UserQuizStat User:{self.user_id} Quiz:{self.quiz_pack_id} Best:{self.best_score}>'
 
 
 # --- Инициализация БД при запуске приложения ---
-# Это гарантирует, что таблицы будут созданы, если их нет.
 @app.before_request
 def create_tables_if_not_exist():
     # Проверяем, существует ли база данных
@@ -99,54 +106,92 @@ def create_tables_if_not_exist():
         with app.app_context():
             db.create_all()
             print("Database 'quiz_app.db' and tables created.")
+            _create_initial_data()  # Вызываем функцию для добавления начальных данных
+
+
+# Функция для добавления начальных данных
+def _create_initial_data():
+    if not QuizPack.query.first():
+        print("Adding initial quiz data...")
+        pack1 = QuizPack(title="Основы Python", description="Базовые вопросы по синтаксису и концепциям Python.",
+                         color='blue', difficulty='Легкий')
+        pack2 = QuizPack(title="Flask & Web Dev", description="Вопросы по фреймворку Flask и основам веб-разработки.",
+                         color='green', difficulty='Средний')
+        db.session.add_all([pack1, pack2])
+        db.session.commit()
+
+        q1_options = ["var x = 10;", "x = 10;", "int x = 10;", "set x = 10;"]
+        q1 = Question(quiz_pack_id=pack1.id, question_text="Как правильно объявить переменную в Python?",
+                      options_json=json.dumps(q1_options), correct_answer_index=1)
+
+        q2_options = ["def func():", "function func():", "func() do:", "define func:"]
+        q2 = Question(quiz_pack_id=pack1.id, question_text="Как объявить функцию в Python?",
+                      options_json=json.dumps(q2_options), correct_answer_index=0)
+
+        q3_options = ["Python IDE", "pip", "conda", "virtualenv"]
+        q3 = Question(quiz_pack_id=pack1.id, question_text="Какой командой устанавливаются пакеты в Python?",
+                      options_json=json.dumps(q3_options), correct_answer_index=1)
+
+        q4_options = ["@app.route('/index')", "@app.get('/index')", "@route('/index')", "app.add_url_rule('/index')"]
+        q4 = Question(quiz_pack_id=pack2.id,
+                      question_text="Какой декоратор используется для определения маршрутов в Flask?",
+                      options_json=json.dumps(q4_options), correct_answer_index=0)
+
+        q5_options = ["SQLObject", "Django ORM", "SQLAlchemy", "Peewee"]
+        q5 = Question(quiz_pack_id=pack2.id, question_text="Какая библиотека часто используется как ORM с Flask?",
+                      options_json=json.dumps(q5_options), correct_answer_index=2)
+
+        db.session.add_all([q1, q2, q3, q4, q5])
+        db.session.commit()
+        print("Initial quiz data added.")
+
+# --- MIDDLEWARE / CONTEXT PROCESSORS ---
+
+@app.before_request
+def load_logged_in_user():
+    """Загружает пользователя из сессии перед каждым запросом."""
+    user_id = session.get('user_id')
+    if user_id is None:
+        g.user = None
+    else:
+        g.user = User.query.get(user_id)
+
+@app.context_processor
+def inject_user():
+    """Делает объект пользователя доступным во всех Jinja2 шаблонах."""
+    return dict(user=g.user)
 
 
 # --- МАРШРУТЫ ---
 
 @app.route("/")
 def index():
-    user = None  # Изначально user равен None
-    logged_in = False
-
-    # Можно добавить логику, чтобы отображать разный контент для авторизованных/неавторизованных
-    if 'user_id' in session:
-        user_id_from_session = session['user_id']
-        user = User.query.get(user_id_from_session)  # Пытаемся найти пользователя по ID из сессии
-
-        if user:  # Если пользователь найден в базе данных
-            logged_in = True
-        else:  # Если user_id есть в сессии, но пользователя нет в БД (старая/недействительная сессия)
-            session.pop('user_id', None)  # Удаляем недействительный user_id из сессии
-            flash("Ваша сессия устарела или пользователь не найден. Пожалуйста, войдите снова.", "info")
-            # Можно перенаправить на страницу логина, или просто продолжить отображение главной как для неавторизованного
-            return redirect(url_for('login'))  # Рекомендуется для четкости
-
-        # Передаем user (может быть None) и logged_in в шаблон
-    return render_template("index.html", user=user, logged_in=logged_in)
+    # user больше не нужно передавать явно, он доступен через g.user / context_processor
+    return render_template("index.html")
 
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
-    if 'user_id' in session:  # Если пользователь уже вошел, перенаправляем на главную
+    if g.user: # Используем g.user вместо 'user_id' in session
         return redirect(url_for('index'))
 
     if request.method == 'POST':
-        username = request.form.get('username')
+        name = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
 
-        if not all([username, email, password, confirm_password]):
+        if not all([name, email, password, confirm_password]):
             flash("Все поля должны быть заполнены!", "error")
         elif password != confirm_password:
             flash("Пароли не совпадают!", "error")
-        elif User.query.filter_by(username=username).first():
+        elif User.query.filter_by(name=name).first():
             flash("Пользователь с таким именем уже существует!", "error")
         elif User.query.filter_by(email=email).first():
             flash("Пользователь с такой почтой уже зарегистрирован!", "error")
         else:
-            new_user = User(username=username, email=email)
-            new_user.set_password(password)
+            new_user = User(name=name, email=email)
+            new_user.set_password(password) # Теперь хеширует
             db.session.add(new_user)
             try:
                 db.session.commit()
@@ -161,21 +206,22 @@ def register():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-    if 'user_id' in session:  # Если пользователь уже вошел, перенаправляем на главную
+    if g.user: # Используем g.user вместо 'user_id' in session
         return redirect(url_for('index'))
 
     if request.method == 'POST':
-        username = request.form.get('username')
+        email = request.form.get('email')
         password = request.form.get('password')
 
-        user = User.query.filter_by(username=username).first()
+        user = User.query.filter_by(email=email).first()
 
+        # check_password теперь сравнивает хеши
         if user and user.check_password(password):
             session['user_id'] = user.id
-            flash(f"Добро пожаловать, {user.username}!", "success")
+            flash(f"Добро пожаловать, {user.name}!", "success")
             return redirect(url_for('index'))
         else:
-            flash("Неверное имя пользователя или пароль.", "error")
+            flash("Неверная почта или пароль.", "error")
 
     return render_template("login.html")
 
@@ -183,273 +229,224 @@ def login():
 @app.route("/logout")
 def logout():
     session.pop('user_id', None)
-    flash("Вы вышли из аккаунта.", "info")
+    flash("Вы успешно вышли из аккаунта.", "info") # Изменил сообщение для ясности
     return redirect(url_for('index'))
 
 
-@app.route("/quiz_list")
-def quiz_list():
-    if 'user_id' not in session:
+@app.route("/packs")
+def packs():
+    if not g.user:
         flash("Пожалуйста, войдите, чтобы просматривать квизы.", "warning")
         return redirect(url_for('login'))
 
-    quizzes = QuizPack.query.all()  # Получаем все доступные квизы
+    all_packs = QuizPack.query.all()
+    user_overall_stats = None # Инициализируем None по умолчанию
 
-    # Можно добавить получение статистики пользователя для каждого квиза здесь
-    user_id = session['user_id']
-    user_quiz_stats = {stat.quiz_pack_id: stat for stat in UserQuizStat.query.filter_by(user_id=user_id).all()}
+    # Если пользователь вошел в систему, получаем его общую статистику
+    if g.user:
+        # Суммируем все total_correct и total_questions из всех записей UserQuizStat для текущего пользователя
+        total_correct_answers = db.session.query(
+            func.sum(UserQuizStat.total_correct)
+        ).filter_by(user_id=g.user.id).scalar() or 0
 
-    return render_template("quiz_list.html", quizzes=quizzes, user_quiz_stats=user_quiz_stats)
+        total_questions_answered = db.session.query(
+            func.sum(UserQuizStat.total_questions)
+        ).filter_by(user_id=g.user.id).scalar() or 0
+
+        # Создаем простой объект (или можно использовать dict), чтобы передать общую статистику в шаблон
+        class UserOverallStats:
+            def __init__(self, correct, total):
+                self.correct_answers = correct
+                self.total_questions = total
+                self.games_played = 0 # Можно добавить, если нужно для отображения на packs
+                self.best_score = 0   # Если нужно
+
+        # Если пользователь уже играл, создаем объект статистики
+        if total_questions_answered > 0 or total_correct_answers > 0:
+            user_overall_stats = UserOverallStats(total_correct_answers, total_questions_answered)
+        else:
+            # Если статистики нет, явно создаем объект с нулями, чтобы не было ошибок в шаблоне
+            user_overall_stats = UserOverallStats(0, 0)
+
+    # Передаем user_overall_stats в шаблон вместо user_stats_dict
+    return render_template("packs.html", packs=all_packs, user_stats=user_overall_stats)
 
 
-@app.route("/user_stats")
-def user_stats():
-    if 'user_id' not in session:
-        flash("Пожалуйста, войдите, чтобы просматривать свою статистику.", "warning")
+@app.route("/profile")
+def profile():
+    if not g.user:
+        flash("Пожалуйста, войдите, чтобы просматривать свой профиль.", "warning")
         return redirect(url_for('login'))
 
-    user = User.query.get(session['user_id'])
+    total_questions = 0
+    correct_answers = 0
+    pack_stats = {}
 
-    # Также можно получить статистику по каждому квизу для конкретного пользователя
-    quiz_stats = UserQuizStat.query.filter_by(user_id=user.id).all()
-    # Если нужно получить названия квизов, можно сделать JOIN или отдельный запрос
-    quiz_pack_titles = {pack.id: pack.title for pack in QuizPack.query.all()}
+    # Получаем все записи статистики для текущего пользователя одним запросом
+    # Eager loading 'quiz_pack' поможет избежать N+1 проблемы, если QuizPack связана с UserQuizStat
+    # Если у вас нет eager loading, просто .all() будет работать
+    user_quiz_stats = UserQuizStat.query.filter_by(user_id=g.user.id).all()
 
-    return render_template("user_profile.html", user=user, quiz_stats=quiz_stats, quiz_pack_titles=quiz_pack_titles)
+    for stat in user_quiz_stats:
+        # Проверяем, что пак существует, прежде чем пытаться получить его вопросы
+        pack = QuizPack.query.get(stat.quiz_pack_id)
+        if pack:
+            total_questions += stat.total_questions
+            correct_answers += stat.total_correct
+
+            pack_stats[pack.id] = {
+                'pack_title': pack.title,
+                'attempts': stat.games_played,
+                'best_score': stat.best_score,
+                'last_score': stat.last_score,
+                'total_questions': len(pack.questions) # Используем len() напрямую
+            }
+
+    return render_template("profile.html",
+                           total_questions=total_questions,
+                           correct_answers=correct_answers,
+                           pack_stats=pack_stats)
 
 
-@app.route("/start_quiz/<int:quiz_id>")
-def start_quiz(quiz_id):
-    if 'user_id' not in session:
+@app.route("/quiz/<int:pack_id>")
+def quiz(pack_id):
+    if not g.user: # Используем g.user
         flash("Пожалуйста, войдите, чтобы начать квиз.", "warning")
         return redirect(url_for('login'))
 
-    quiz_pack = QuizPack.query.get_or_404(quiz_id)
-    questions = quiz_pack.questions  # Получаем все вопросы для этого квиза
+    quiz_pack = QuizPack.query.get_or_404(pack_id)
+    # Убедитесь, что quiz_pack.questions возвращает список или QuerySet, который можно преобразовать в список
+    # Если questions - это отношение SQLAlchemy, используйте .all()
+    raw_questions = quiz_pack.questions
 
-    if not questions:
+    if not raw_questions:
         flash(f"В квизе '{quiz_pack.title}' пока нет вопросов.", "info")
-        return redirect(url_for('quiz_list'))
+        return redirect(url_for('packs'))
 
-    # Получаем ID вопросов и перемешиваем их
-    quiz_questions_ids = [q.id for q in questions]
-    random.shuffle(quiz_questions_ids)  # <--- ВОТ ГЛАВНОЕ ИЗМЕНЕНИЕ
+    questions_for_js = []
+    for q in raw_questions:
+        questions_for_js.append({
+            'id': q.id,
+            'question': q.question_text,
+            'options': q.get_options(), # Убедитесь, что get_options() возвращает список строк
+            'correct': q.correct_answer_index # Убедитесь, что это 0-based индекс правильного ответа
+        })
+    random.shuffle(questions_for_js)
 
-    # Сохраняем информацию о текущем квизе и вопросах в сессии
-    session['current_quiz_id'] = quiz_id
-    session['current_question_index'] = 0
-    session['quiz_questions_ids'] = quiz_questions_ids  # Используем перемешанный список
-    session['quiz_correct_count'] = 0
-    session['quiz_history'] = []  # Инициализируем историю ответов, чтобы история начинала собираться с нуля при каждом новом квизе.
+    # Храним полные данные вопросов в сессии для валидации при отправке результатов
+    # Это важно для submit_quiz, который будет проверять ответы на сервере
+    session['current_quiz_questions_data'] = questions_for_js
+    session['current_quiz_pack_id'] = pack_id
 
-    return redirect(url_for('quiz_game'))
+    # Подготавливаем данные для JavaScript. Теперь они включают pack_id и все вопросы.
+    js_data_for_template = {
+        'pack_id': pack_id,
+        'questions': questions_for_js
+    }
 
+    # Для начального отображения в шаблоне (JavaScript обновит это динамически)
+    total_questions = len(questions_for_js)
+    current_question_index = 0 # Всегда начинаем с 0 для клиентского квиза
 
-@app.route("/quiz_game", methods=['GET', 'POST'])
-def quiz_game():
-    if 'user_id' not in session or 'current_quiz_id' not in session:
-        flash("Квиз не начат или ваша сессия истекла. Пожалуйста, начните квиз заново.", "warning")
-        return redirect(url_for('quiz_list'))
-
-    user_id = session['user_id']
-    current_quiz_id = session['current_quiz_id']
-    quiz_questions_ids = session['quiz_questions_ids']
-    current_question_index = session.get('current_question_index', 0)
-
-    # Инициализируем переменные для обратной связи и текста правильного ответа
-    feedback_message = None
-    correct_answer_text = None
-
-    if request.method == 'POST':
-        user_answer_key = request.form.get('answer')  # Получаем ключ ответа, который выбрал пользователь (A, B, C, D)
-
-        if current_question_index < len(quiz_questions_ids):
-            current_question_id = quiz_questions_ids[current_question_index]
-            question = Question.query.get_or_404(current_question_id)
-
-            # Получаем все варианты ответа, чтобы найти текст по букве
-            all_answer_options = question.get_answer_options()
-
-            if user_answer_key == question.correct_answer:
-                session['quiz_correct_count'] += 1
-                feedback_message = "Верно!"
-            else:
-                feedback_message = "Неверно!"
-                # Находим текст правильного ответа по его букве
-                correct_answer_text = all_answer_options.get(question.correct_answer, "Неизвестно")
-
-                # Сохраняем информацию об этом вопросе и ответе в истории квиза
-            # (Этот блок выполняется для КАЖДОГО ОТВЕТА, пока квиз не закончится)
-            session['quiz_history'].append({
-                'question_id': question.id,
-                'question_text': question.question_text,
-                'image_url': question.image_url,
-                'user_answer_key': user_answer_key,  # Что ответил пользователь (A, B, C, D)
-                'user_answer_text': all_answer_options.get(user_answer_key, "Не выбран"),  # Текст ответа пользователя
-                'correct_answer_key': question.correct_answer,  # Правильная буква (A, B, C, D)
-                'correct_answer_text': all_answer_options.get(question.correct_answer, "Неизвестно"),
-                # Текст правильного ответа
-                'is_correct': (user_answer_key == question.correct_answer)
-            })
-
-            # Переходим к следующему вопросу
-            session['current_question_index'] += 1
-            current_question_index = session['current_question_index']  # Обновляем для дальнейшей логики
-
-        # --- БЛОК ОБРАБОТКИ ЗАВЕРШЕНИЯ КВИЗА (то, что вы спрашивали) ---
-        if current_question_index >= len(quiz_questions_ids):
-            # Квиз закончен.
-
-            total_questions = len(quiz_questions_ids)
-            correct_count = session['quiz_correct_count']
-            quiz_pack = QuizPack.query.get(current_quiz_id)
-            quiz_pack_title = quiz_pack.title if quiz_pack else "Неизвестный квиз"
-
-            # Обновление общей статистики пользователя
-            user = User.query.get(user_id)
-            if user:
-                user.total_questions_attempted += total_questions
-                user.total_correct_answers += correct_count
-
-                # Обновление статистики для конкретного квиза
-                user_quiz_stat = UserQuizStat.query.filter_by(user_id=user_id, quiz_pack_id=current_quiz_id).first()
-                if not user_quiz_stat:
-                    user_quiz_stat = UserQuizStat(user_id=user_id, quiz_pack_id=current_quiz_id, games_played=0,
-                                                  total_correct=0, total_questions=0)
-                    db.session.add(user_quiz_stat)
-
-                user_quiz_stat.games_played += 1
-                user_quiz_stat.total_correct += correct_count
-                user_quiz_stat.total_questions += total_questions
-
-                db.session.commit()
-
-            # ПОЛУЧАЕМ ПОЛНУЮ ИСТОРИЮ КВИЗА ИЗ СЕССИИ ПЕРЕД ЕЕ ОЧИСТКОЙ
-            quiz_history = session.get('quiz_history', [])
-
-            # Очистка ВСЕЙ сессии, связанной с квизом, после его завершения
-            session.pop('current_quiz_id', None)
-            session.pop('current_question_index', None)
-            session.pop('quiz_questions_ids', None)
-            session.pop('quiz_correct_count', None)
-            session.pop('quiz_history', None)  # <--- ЭТОТ ПУНКТ ОЧИЩАЕТ СОХРАНЕННУЮ ИСТОРИЮ
-
-            # Перенаправляем на страницу сводки (quiz_summary.html)
-            return render_template("quiz_summary.html",
-                                   correct_count=correct_count,
-                                   total_questions=total_questions,
-                                   quiz_pack_title=quiz_pack_title,
-                                   quiz_history=quiz_history  # Передаем историю квиза в шаблон
-                                   )
-        # --- КОНЕЦ БЛОКА ОБРАБОТКИ ЗАВЕРШЕНИЯ КВИЗА ---
-
-    # Логика для отображения следующего вопроса (для GET-запроса или если вопросы еще есть после POST)
-    if current_question_index < len(quiz_questions_ids):
-        current_question_id = quiz_questions_ids[current_question_index]
-        question = Question.query.get_or_404(current_question_id)
-
-        answer_options_dict = question.get_answer_options()
-        answer_options_list = list(answer_options_dict.items())
-        random.shuffle(answer_options_list)
-        answer_options = answer_options_list
-
-        total_questions = len(quiz_questions_ids)
-        current_question_num = current_question_index + 1
-
-        return render_template("quiz_game.html",
-                               question=question,
-                               answer_options=answer_options,
-                               total_questions=total_questions,
-                               current_question_num=current_question_num,
-                               feedback_message=feedback_message,
-                               # Передаем сообщение обратной связи (будет None при первом GET)
-                               correct_answer_text=correct_answer_text
-                               # Передаем текст правильного ответа (будет None при первом GET)
-                               )
-    else:
-        # Этот блок сработает, если пользователь попытается попасть на /quiz_game
-        # после завершения квиза без текущей сессии квиза.
-        flash("Квиз завершен или неактивен. Пожалуйста, выберите новый квиз.", "info")
-        return redirect(url_for('quiz_list'))
+    return render_template("quiz.html",
+                           pack=quiz_pack,
+                           questions_data_json=json.dumps(js_data_for_template), # Передаем все данные в виде JSON-строки
+                           current_question_index=current_question_index, # Для начального отображения
+                           total_questions=total_questions) # Для начального отображения
 
 
-@app.route("/quiz_results")
-def quiz_results():
-    if 'user_id' not in session or 'current_quiz_id' not in session:
-        flash("Результаты квиза недоступны.", "warning")
-        return redirect(url_for('index'))
+@app.route("/submit_quiz", methods=['POST'])
+def submit_quiz():
+    if not g.user:
+        return jsonify({"status": "error", "message": "Not logged in"}), 401
 
-    user = User.query.get(session['user_id'])
-    quiz_id = session['current_quiz_id']
-    correct_count = session.get('quiz_correct_count', 0)
-    total_questions = len(session.get('quiz_questions_ids', []))
-    quiz_pack = QuizPack.query.get(quiz_id)
+    data = request.get_json()
+    pack_id = data.get('pack_id')
+    user_answers_indices = data.get('answers', []) # Это список ответов пользователя
 
-    # Обновляем общую статистику пользователя
-    user.total_correct_answers += correct_count
-    user.total_questions_attempted += total_questions
+    if not pack_id or not isinstance(user_answers_indices, list):
+        return jsonify({"status": "error", "message": "Invalid data"}), 400
 
-    # Обновляем или создаем статистику пользователя для конкретного квиза
-    user_quiz_stat = UserQuizStat.query.filter_by(user_id=user.id, quiz_pack_id=quiz_id).first()
-    if user_quiz_stat:
-        user_quiz_stat.correct_answers_in_quiz += correct_count
-        user_quiz_stat.questions_attempted_in_quiz += total_questions
-    else:
-        new_stat = UserQuizStat(user_id=user.id, quiz_pack_id=quiz_id,
-                                correct_answers_in_quiz=correct_count,
-                                questions_attempted_in_quiz=total_questions)
-        db.session.add(new_stat)
+    if not g.user:
+        return jsonify({"status": "error", "message": "User session expired or not found"}), 404
+
+    quiz_pack = QuizPack.query.get(pack_id)
+    if not quiz_pack:
+        return jsonify({"status": "error", "message": "Quiz pack not found"}), 404
+
+    # Получаем данные вопросов из сессии для валидации
+    quiz_questions_data_from_session = session.pop('current_quiz_questions_data', None)
+    session.pop('current_quiz_pack_id', None)
+
+    if not quiz_questions_data_from_session or len(user_answers_indices) != len(quiz_questions_data_from_session):
+        # Если данные сессии отсутствуют или количество ответов не совпадает, это ошибка
+        return jsonify({"status": "error", "message": "Quiz session data missing or mismatched answers. Please restart the quiz."}), 400
+
+    score = 0
+    # Проверяем каждый ответ пользователя
+    for i, user_chosen_index in enumerate(user_answers_indices):
+        # Убедитесь, что 'correct' - это 0-based индекс правильного ответа
+        if user_chosen_index == quiz_questions_data_from_session[i]['correct']:
+            score += 1
+
+    total_questions_answered = len(quiz_questions_data_from_session) # Количество вопросов в квизе
+
+    user_quiz_stat = UserQuizStat.query.filter_by(user_id=g.user.id, quiz_pack_id=pack_id).first()
+    if not user_quiz_stat:
+        user_quiz_stat = UserQuizStat(
+            user_id=g.user.id,
+            quiz_pack_id=pack_id,
+            # Инициализируем числовые поля нулем при первом создании
+            games_played=0,
+            total_correct=0,
+            total_questions=0,
+            last_score=0,
+            best_score=0
+        )
+        db.session.add(user_quiz_stat)
+
+    # Теперь эти операции будут безопасны, так как поля точно являются числами
+    user_quiz_stat.games_played += 1
+    user_quiz_stat.total_correct += score
+    user_quiz_stat.total_questions += total_questions_answered
+    user_quiz_stat.last_score = score
+    user_quiz_stat.best_score = max(user_quiz_stat.best_score, score)
 
     try:
         db.session.commit()
-        flash("Ваша статистика обновлена!", "success")
+        # Возвращаем успешный статус и данные для отображения или редиректа
+        return jsonify({"status": "success", "message": "Quiz results submitted", "score": score,
+                        "total": total_questions_answered})
     except Exception as e:
         db.session.rollback()
-        flash(f"Ошибка при сохранении статистики: {e}", "error")
-
-    # Очищаем сессию квиза
-    session.pop('current_quiz_id', None)
-    session.pop('current_question_index', None)
-    session.pop('quiz_questions_ids', None)
-    session.pop('quiz_correct_count', None)
-
-    return render_template("quiz_results.html", correct_count=correct_count,
-                           total_questions=total_questions, quiz_pack_title=quiz_pack.title)
+        return jsonify({"status": "error", "message": f"Failed to save quiz results: {e}"}), 500
 
 
-@app.route("/quiz_summary")
-def quiz_summary():
-    # Этот маршрут будет вызываться из quiz_game после завершения квиза
-    # и уже получит данные через render_template
-    # В обычной ситуации, если бы мы не перенаправляли сразу из POST,
-    # здесь пришлось бы восстанавливать данные из сессии или БД.
-    # Но так как мы делаем render_template напрямую, то здесь отдельная логика не нужна.
-    # Просто убедитесь, что вы правильно вызываете его из quiz_game, передавая все нужные параметры.
-    pass # Этот маршрут фактически не нужен, если вы рендерите шаблон прямо из quiz_game после POST.
-         # Я оставлю его как "заглушку", если вы захотите разделить логику.
-         # В текущем решении, вся логика передачи данных происходит в quiz_game.
 
 # --- АДМИН-ПАНЕЛЬ ---
+# В реальном приложении здесь нужна проверка на роль администратора!
 
 @app.route("/admin")
 def admin_dashboard():
-    # Пока что не будем делать проверку на админа, добавим позже
     quiz_packs = QuizPack.query.all()
     return render_template("admin/dashboard.html", quiz_packs=quiz_packs)
 
+
 @app.route("/admin/quiz/new", methods=['GET', 'POST'])
 def admin_new_quiz_pack():
-    # Здесь будем обрабатывать добавление нового квиз-пака
     if request.method == 'POST':
         title = request.form.get('title')
         description = request.form.get('description')
+        color = request.form.get('color', 'blue')
+        difficulty = request.form.get('difficulty', 'Легкий')
 
         if not title:
             flash("Название квиз-пака не может быть пустым.", "error")
         elif QuizPack.query.filter_by(title=title).first():
-            flash("Квиз-пак с таким названием уже существует.", "error")
+            flash("Квиз-пак с таким названием уже существует!", "error")
         else:
-            new_pack = QuizPack(title=title, description=description)
+            new_pack = QuizPack(title=title, description=description, color=color,
+                                difficulty=difficulty)
             db.session.add(new_pack)
             try:
                 db.session.commit()
@@ -460,52 +457,52 @@ def admin_new_quiz_pack():
                 flash(f"Ошибка при добавлении квиз-пака: {e}", "error")
     return render_template("admin/new_quiz_pack.html")
 
+
 @app.route("/admin/quiz/<int:quiz_id>/add_question", methods=['GET', 'POST'])
 def admin_add_question(quiz_id):
-    # Здесь будем обрабатывать добавление нового вопроса к квиз-паку
     quiz_pack = QuizPack.query.get_or_404(quiz_id)
 
     if request.method == 'POST':
         question_text = request.form.get('question_text')
-        image_url = request.form.get('image_url') # Получаем URL картинки
-        option_A = request.form.get('option_A')
-        option_B = request.form.get('option_B')
-        option_C = request.form.get('option_C')
-        option_D = request.form.get('option_D')
-        correct_answer = request.form.get('correct_answer')
+        image_url = request.form.get('image_url')
+        option_0 = request.form.get('option_0')
+        option_1 = request.form.get('option_1')
+        option_2 = request.form.get('option_2')
+        option_3 = request.form.get('option_3')
+        correct_answer_idx_str = request.form.get('correct_answer_index')
 
-        if not all([question_text, option_A, option_B, option_C, option_D, correct_answer]):
+        if not all([question_text, option_0, option_1, option_2, option_3, correct_answer_idx_str is not None]):
             flash("Все поля вопроса и вариантов ответа должны быть заполнены.", "error")
-        elif correct_answer not in ['A', 'B', 'C', 'D']:
-            flash("Правильный ответ должен быть A, B, C или D.", "error")
         else:
-            answer_options = {
-                "A": option_A,
-                "B": option_B,
-                "C": option_C,
-                "D": option_D
-            }
+            try:
+                correct_answer_index = int(correct_answer_idx_str)
+                if not (0 <= correct_answer_index <= 3):
+                    raise ValueError("Индекс правильного ответа вне диапазона 0-3.")
+            except (ValueError, TypeError):
+                flash("Индекс правильного ответа должен быть числом от 0 до 3.", "error")
+                return redirect(url_for('admin_add_question', quiz_id=quiz_id))
+
+            options_list = [option_0, option_1, option_2, option_3]
+
             new_question = Question(
                 quiz_pack_id=quiz_id,
                 question_text=question_text,
-                image_url=image_url if image_url else None, # Сохраняем URL картинки
-                answer_options_json=json.dumps(answer_options),
-                correct_answer=correct_answer
+                image_url=image_url if image_url else None,
+                options_json=json.dumps(options_list),
+                correct_answer_index=correct_answer_index
             )
             db.session.add(new_question)
             try:
                 db.session.commit()
                 flash("Вопрос успешно добавлен!", "success")
-                # После добавления вопроса, можно остаться на этой же странице
                 return redirect(url_for('admin_add_question', quiz_id=quiz_id))
             except Exception as e:
                 db.session.rollback()
                 flash(f"Ошибка при добавлении вопроса: {e}", "error")
 
-    return render_template("admin/add_question.html", quiz_pack=quiz_pack)
+    questions_in_pack = Question.query.filter_by(quiz_pack_id=quiz_id).all()
+    return render_template("admin/add_question.html", quiz_pack=quiz_pack, questions_in_pack=questions_in_pack)
 
-
-# --- НОВЫЕ МАРШРУТЫ ДЛЯ РЕДАКТИРОВАНИЯ И УДАЛЕНИЯ КВИЗ-ПАКОВ ---
 
 @app.route("/admin/quiz/<int:quiz_id>/edit", methods=['GET', 'POST'])
 def admin_edit_quiz_pack(quiz_id):
@@ -514,15 +511,19 @@ def admin_edit_quiz_pack(quiz_id):
     if request.method == 'POST':
         title = request.form.get('title')
         description = request.form.get('description')
+        color = request.form.get('color', 'blue')
+        difficulty = request.form.get('difficulty', 'Легкий')
 
         if not title:
             flash("Название квиз-пака не может быть пустым.", "error")
         elif QuizPack.query.filter_by(title=title).first() and QuizPack.query.filter_by(
                 title=title).first().id != quiz_pack.id:
-            flash("Квиз-пак с таким названием уже существует.", "error")
+            flash("Квиз-пак с таким названием уже существует!", "error")
         else:
             quiz_pack.title = title
             quiz_pack.description = description
+            quiz_pack.color = color
+            quiz_pack.difficulty = difficulty
             try:
                 db.session.commit()
                 flash(f"Квиз-пак '{quiz_pack.title}' успешно обновлен!", "success")
@@ -539,9 +540,7 @@ def admin_delete_quiz_pack(quiz_id):
     quiz_pack = QuizPack.query.get_or_404(quiz_id)
 
     try:
-        # Сначала удаляем все связанные вопросы
         Question.query.filter_by(quiz_pack_id=quiz_id).delete()
-        # Удаляем статистику пользователей для этого квиза
         UserQuizStat.query.filter_by(quiz_pack_id=quiz_id).delete()
         db.session.delete(quiz_pack)
         db.session.commit()
@@ -553,48 +552,46 @@ def admin_delete_quiz_pack(quiz_id):
     return redirect(url_for('admin_dashboard'))
 
 
-# --- РЕДАКТИРОВАНИЕ И УДАЛЕНИЕ ВОПРОСОВ ---
-
 @app.route("/admin/question/<int:question_id>/edit", methods=['GET', 'POST'])
 def admin_edit_question(question_id):
     question = Question.query.get_or_404(question_id)
-    quiz_pack = QuizPack.query.get_or_404(question.quiz_pack_id)  # Для ссылки "Назад" и контекста
+    quiz_pack = QuizPack.query.get_or_404(question.quiz_pack_id)
 
     if request.method == 'POST':
         question_text = request.form.get('question_text')
         image_url = request.form.get('image_url')
-        option_A = request.form.get('option_A')
-        option_B = request.form.get('option_B')
-        option_C = request.form.get('option_C')
-        option_D = request.form.get('option_D')
-        correct_answer = request.form.get('correct_answer')
+        option_0 = request.form.get('option_0')
+        option_1 = request.form.get('option_1')
+        option_2 = request.form.get('option_2')
+        option_3 = request.form.get('option_3')
+        correct_answer_idx_str = request.form.get('correct_answer_index')
 
-        if not all([question_text, option_A, option_B, option_C, option_D, correct_answer]):
+        if not all([question_text, option_0, option_1, option_2, option_3, correct_answer_idx_str is not None]):
             flash("Все поля вопроса и вариантов ответа должны быть заполнены.", "error")
-        elif correct_answer not in ['A', 'B', 'C', 'D']:
-            flash("Правильный ответ должен быть A, B, C или D.", "error")
         else:
-            answer_options = {
-                "A": option_A,
-                "B": option_B,
-                "C": option_C,
-                "D": option_D
-            }
+            try:
+                correct_answer_index = int(correct_answer_idx_str)
+                if not (0 <= correct_answer_index <= 3):
+                    raise ValueError("Индекс правильного ответа вне диапазона 0-3.")
+            except (ValueError, TypeError):
+                flash("Индекс правильного ответа должен быть числом от 0 до 3.", "error")
+                return redirect(url_for('admin_edit_question', question_id=question_id))
+
+            options_list = [option_0, option_1, option_2, option_3]
+
             question.question_text = question_text
             question.image_url = image_url if image_url else None
-            question.answer_options_json = json.dumps(answer_options)
-            question.correct_answer = correct_answer
+            question.options_json = json.dumps(options_list)
+            question.correct_answer_index = correct_answer_index
             try:
                 db.session.commit()
                 flash("Вопрос успешно обновлен!", "success")
-                # После обновления вопроса, можно вернуться к списку вопросов этого квиз-пака
                 return redirect(url_for('admin_add_question', quiz_id=quiz_pack.id))
             except Exception as e:
                 db.session.rollback()
                 flash(f"Ошибка при обновлении вопроса: {e}", "error")
 
-    # Для GET-запроса, заполняем форму текущими данными вопроса
-    current_options = question.get_answer_options()
+    current_options = question.get_options()
     return render_template("admin/edit_question.html",
                            question=question,
                            quiz_pack=quiz_pack,
@@ -604,7 +601,7 @@ def admin_edit_question(question_id):
 @app.route("/admin/question/<int:question_id>/delete", methods=['POST'])
 def admin_delete_question(question_id):
     question = Question.query.get_or_404(question_id)
-    quiz_pack_id = question.quiz_pack_id  # Сохраняем ID пака для редиректа
+    quiz_pack_id = question.quiz_pack_id
 
     try:
         db.session.delete(question)
@@ -614,51 +611,8 @@ def admin_delete_question(question_id):
         db.session.rollback()
         flash(f"Ошибка при удалении вопроса: {e}", "error")
 
-    return redirect(url_for('admin_add_question', quiz_id=quiz_pack_id))  # Возвращаемся к списку вопросов пака
+    return redirect(url_for('admin_add_question', quiz_id=quiz_pack_id))
 
 
-# --- Запуск приложения ---
 if __name__ == '__main__':
-    # Эта часть также создаст таблицы при первом запуске, если они не существуют.
-    # Но `@app.before_request` более надежен для гарантии создания при любом первом запросе.
-    with app.app_context():
-        db.create_all()  # Создаем таблицы при запуске app.py напрямую
-
-        # Пример добавления начальных данных для тестирования
-        # Добавляем пак и вопросы, если их нет
-        if not QuizPack.query.first():
-            print("Adding initial quiz data...")
-            pack1 = QuizPack(title="Основы Python", description="Базовые вопросы по синтаксису и концепциям Python.")
-            pack2 = QuizPack(title="Flask & Web Dev",
-                             description="Вопросы по фреймворку Flask и основам веб-разработки.")
-            db.session.add_all([pack1, pack2])
-            db.session.commit()
-
-            q1_options = json.dumps({"A": "var x = 10;", "B": "x = 10;", "C": "int x = 10;", "D": "set x = 10;"})
-            q1 = Question(quiz_pack_id=pack1.id, question_text="Как правильно объявить переменную в Python?",
-                          answer_options_json=q1_options, correct_answer="B")
-
-            q2_options = json.dumps(
-                {"A": "def func():", "B": "function func():", "C": "func() do:", "D": "define func:"})
-            q2 = Question(quiz_pack_id=pack1.id, question_text="Как объявить функцию в Python?",
-                          answer_options_json=q2_options, correct_answer="A")
-
-            q3_options = json.dumps({"A": "Python IDE", "B": "pip", "C": "conda", "D": "virtualenv"})
-            q3 = Question(quiz_pack_id=pack1.id, question_text="Какой командой устанавливаются пакеты в Python?",
-                          answer_options_json=q3_options, correct_answer="B")
-
-            q4_options = json.dumps({"A": "@app.route('/index')", "B": "@app.get('/index')", "C": "@route('/index')",
-                                     "D": "app.add_url_rule('/index')"})
-            q4 = Question(quiz_pack_id=pack2.id,
-                          question_text="Какой декоратор используется для определения маршрутов в Flask?",
-                          answer_options_json=q4_options, correct_answer="A")
-
-            q5_options = json.dumps({"A": "SQLObject", "B": "Django ORM", "C": "SQLAlchemy", "D": "Peewee"})
-            q5 = Question(quiz_pack_id=pack2.id, question_text="Какая библиотека часто используется как ORM с Flask?",
-                          answer_options_json=q5_options, correct_answer="C")
-
-            db.session.add_all([q1, q2, q3, q4, q5])
-            db.session.commit()
-            print("Initial quiz data added.")
-
     app.run(debug=True)

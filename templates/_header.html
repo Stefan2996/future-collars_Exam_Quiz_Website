@@ -1,0 +1,25 @@
+<!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="{{ url_for('index') }}" class="logo">
+                    <i class="fas fa-brain"></i>
+                    <span>QuizMaster</span>
+                </a>
+                <div class="header-actions">
+                    {% if user %}
+                        <a href="{{ url_for('profile') }}" class="btn btn-outline">
+                            <i class="fas fa-user"></i>
+                            {{ user.name }}
+                        </a>
+                        <a href="{{ url_for('logout') }}" class="btn btn-ghost btn-icon-logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-outline">Войти</a>
+                        <a href="{{ url_for('register') }}" class="btn btn-primary">Регистрация</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
