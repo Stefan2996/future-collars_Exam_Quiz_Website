@@ -55,11 +55,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const packId = quizData.pack_id     // ID пака
 
     let currentQuestionIndex = 0
-    const userAnswers = [] // Массив для хранения ИНДЕКСОВ выбранных пользователем ответов для КАЖДОГО вопроса
+    // Массив для хранения объектов { questionId: ID_вопроса, selectedAnswerIndex: выбранный_индекс }
+    const userAnswers = []
 
     const questionTextElement = document.getElementById("question-text")
     const answersContainer = document.getElementById("answers-container")
-    const selectedAnswerInput = document.getElementById("selected-answer-input")
+    const selectedAnswerInput = document.getElementById("selected-answer-input") // Временное хранение выбранного ответа
     const nextQuestionBtn = document.getElementById("next-question-btn")
     const finishQuizBtn = document.getElementById("finish-quiz-btn") // Эта кнопка пока скрыта
     const questionCounter = document.getElementById("question-counter")
@@ -69,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function renderQuestion() {
         // Если вопросы закончились, завершаем квиз
         if (currentQuestionIndex >= questions.length) {
-            showResults();
+            showResults(); // Вызываем функцию завершения
             return;
         }
 
@@ -81,7 +82,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const button = document.createElement("button")
             button.type = "button"
             button.classList.add("answer-btn")
-            button.dataset.answer = index // Храним индекс варианта ответа в data-атрибуте
+            button.dataset.answerIndex = index // Храним индекс варианта ответа
+            button.dataset.questionId = currentQuestion.id // Храним ID вопроса
             button.innerHTML = `<span class="answer-letter">${String.fromCharCode(65 + index)}.</span><span class="answer-text">${option}</span>`
 
             // Добавляем слушатель кликов для каждой кнопки ответа
@@ -91,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Добавляем класс 'selected' к нажатой кнопке
                 button.classList.add("selected")
                 // Записываем выбранный индекс ответа в скрытое поле
-                selectedAnswerInput.value = button.dataset.answer
+                selectedAnswerInput.value = button.dataset.answerIndex
                 // Активируем кнопку "Следующий вопрос"
                 nextQuestionBtn.disabled = false
             })
@@ -155,9 +157,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const result = await response.json(); // Получаем ответ от сервера
 
-            if (result.status === "success") {
-                // Если успешно, перенаправляем на страницу профиля
-                window.location.href = `/profile`;
+            if (result.success) { // Проверяем поле 'success' из ответа сервера
+                // Если успешно, перенаправляем на страницу результатов, используя redirect_url
+                window.location.href = result.redirect_url;
             } else {
                 // Если ошибка, показываем сообщение и перенаправляем на страницу паков
                 alert(`Ошибка: ${result.message}`);
@@ -172,18 +174,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Слушатель для кнопки "Следующий вопрос" / "Завершить квиз"
     nextQuestionBtn.addEventListener("click", () => {
-        const selectedAnswer = selectedAnswerInput.value
+        const selectedAnswer = selectedAnswerInput.value // Получаем индекс выбранного ответа
+        // Получаем текущий вопрос, чтобы взять его ID
+        const currentQuestion = questions[currentQuestionIndex];
+
         // Проверяем, выбран ли ответ
         if (selectedAnswer === "") {
             // Этого не должно произойти, так как кнопка деактивирована,
             // но на всякий случай оставляем проверку.
-            return
+            return;
         }
 
-        userAnswers.push(parseInt(selectedAnswer)) // Добавляем выбранный ответ в массив
+        // Сохраняем ID вопроса и выбранный индекс ответа
+        userAnswers.push({
+            questionId: currentQuestion.id,
+            selectedAnswerIndex: parseInt(selectedAnswer)
+        });
 
-        currentQuestionIndex++ // Переходим к следующему вопросу
-        renderQuestion() // Рендерим следующий вопрос
+        currentQuestionIndex++; // Переходим к следующему вопросу
+        renderQuestion(); // Рендерим следующий вопрос
     })
 
     // Инициализация: рендерим первый вопрос при загрузке страницы

@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block title %}Результаты: {{ pack.title }} - QuizMaster{% endblock %}
+
+{% block header %}
+<header class="header header-compact-padding">
+    <div class="container">
+        <div class="header-content">
+            <a href="{{ url_for('packs') }}" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                Назад к пакам
+            </a>
+            <div class="quiz-title">
+                <i class="fas fa-chart-bar"></i>
+                <span>Результаты квиза</span>
+            </div>
+        </div>
+    </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<div class="results-bg">
+    <div class="container">
+        <div class="results-container">
+            <div class="main-results-card">
+                <div class="results-header">
+                    <div class="results-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h1>{{ pack.title }}</h1>
+                    <p class="pack-description">{{ pack.description }}</p>
+                </div>
+
+                <div class="score-section">
+                    <div class="main-score">
+                        <span class="score-number">{{ quiz_stat.score }}</span>
+                        <span class="score-divider">/</span>
+                        <span class="total-number">{{ quiz_stat.total_questions }}</span>
+                    </div>
+                    <div class="percentage-score">
+                        {% if quiz_stat.total_questions > 0 %}
+                            {{ ((quiz_stat.score / quiz_stat.total_questions) * 100) | round | int }}% правильных ответов
+                        {% else %}
+                            0% правильных ответов
+                        {% endif %}
+                    </div>
+                    <div class="completion-date">
+                        Завершено: {{ quiz_stat.completed_at.strftime('%d.%m.%Y в %H:%M') }}
+                    </div>
+                </div>
+
+                <div class="performance-badge">
+                    {% set percentage = ((quiz_stat.score / quiz_stat.total_questions) * 100) | round | int %}
+                    {% if percentage >= 90 %}
+                        <div class="badge excellent">
+                            <i class="fas fa-star"></i>
+                            <span>Отличный результат!</span>
+                        </div>
+                    {% elif percentage >= 70 %}
+                        <div class="badge good">
+                            <i class="fas fa-thumbs-up"></i>
+                            <span>Хороший результат!</span>
+                        </div>
+                    {% elif percentage >= 50 %}
+                        <div class="badge average">
+                            <i class="fas fa-check"></i>
+                            <span>Неплохо!</span>
+                        </div>
+                    {% else %}
+                        <div class="badge needs-improvement">
+                            <i class="fas fa-redo"></i>
+                            <span>Можно лучше!</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="pack-statistics-card">
+                <h3>
+                    <i class="fas fa-chart-line"></i>
+                    Ваша статистика по этому паку
+                </h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ pack_stats.total_attempts }}</div>
+                        <div class="stat-label">Попыток</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ pack_stats.best_score }}/{{ pack_stats.total_questions_in_pack }}</div>
+                        <div class="stat-label">Лучший результат</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ pack_stats.average_score | round(1) }}</div>
+                        <div class="stat-label">Средний балл</div>
+                    </div>
+                    <div class="stat-item">
+                        {% if pack_stats.total_questions_in_pack > 0 %}
+                            <div class="stat-value">{{ ((pack_stats.best_score / pack_stats.total_questions_in_pack) * 100) | round | int }}%</div>
+                        {% else %}
+                            <div class="stat-value">0%</div>
+                        {% endif %}
+                        <div class="stat-label">Лучшая точность</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detailed-results-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-list-check"></i>
+                        Подробные результаты
+                    </h3>
+                    <button class="toggle-details-btn" onclick="toggleDetails()">
+                        <span id="toggle-text">Показать детали</span>
+                        <i class="fas fa-chevron-down" id="toggle-icon"></i>
+                    </button>
+                </div>
+
+                <div class="questions-summary">
+                    <div class="summary-item correct">
+                        <i class="fas fa-check-circle"></i>
+                        <span>{{ quiz_stat.score }} правильных</span>
+                    </div>
+                    <div class="summary-item incorrect">
+                        <i class="fas fa-times-circle"></i>
+                        <span>{{ quiz_stat.total_questions - quiz_stat.score }} неправильных</span>
+                    </div>
+                </div>
+
+                <div class="questions-details" id="questions-details" style="display: none;">
+                    {% for result in results_data %}
+                    <div class="question-result {% if result.is_correct %}correct{% else %}incorrect{% endif %}">
+                        <div class="question-header">
+                            <div class="question-number">
+                                Вопрос {{ loop.index }}
+                                {% if result.is_correct %}
+                                    <i class="fas fa-check-circle correct-icon"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle incorrect-icon"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="question-text">{{ result.question_text }}</div>
+
+                        <div class="answers-review">
+                            {% for option_text in result.options %}
+                            <div class="answer-option
+                                {% if loop.index0 == result.user_selected_index and not result.is_correct %}user-wrong-answer{% endif %}
+                                {% if loop.index0 == result.user_selected_index and result.is_correct %}user-correct-answer{% endif %}">
+
+                                <span class="option-letter">{{ (65 + loop.index0) | chr }}.</span>
+                                <span class="option-text">{{ option_text }}</span>
+
+                                {% if loop.index0 == result.user_selected_index and result.is_correct %}
+                                    <i class="fas fa-check answer-indicator correct"></i>
+                                {% endif %}
+
+                                {% if loop.index0 == result.user_selected_index and not result.is_correct %}
+                                    <i class="fas fa-times answer-indicator incorrect"></i>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="{{ url_for('quiz', pack_id=pack.id) }}" class="btn btn-primary">
+                    <i class="fas fa-redo"></i>
+                    Пройти снова
+                </a>
+                <a href="{{ url_for('packs') }}" class="btn btn-outline">
+                    <i class="fas fa-th-large"></i>
+                    Другие паки
+                </a>
+                <a href="{{ url_for('profile') }}" class="btn btn-secondary">
+                    <i class="fas fa-user"></i>
+                    Мой профиль
+                </a>
+            </div>
+
+            <div class="share-section">
+                <h4>Поделиться результатом</h4>
+                <div class="share-buttons">
+                    <button class="share-btn" onclick="shareResult()">
+                        <i class="fas fa-share"></i>
+                        Поделиться
+                    </button>
+                    <button class="share-btn" onclick="copyResult()">
+                        <i class="fas fa-copy"></i>
+                        Копировать
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ПЕРЕМЕЩЕНО: Скрипты и стили должны быть внутри блока content (или других блоков, определенных в base.html) #}
+<script>
+function toggleDetails() {
+    const details = document.getElementById('questions-details');
+    const toggleText = document.getElementById('toggle-text');
+    const toggleIcon = document.getElementById('toggle-icon');
+
+    if (details.style.display === 'none' || details.style.display === '') {
+        details.style.display = 'block';
+        toggleText.textContent = 'Скрыть детали';
+        toggleIcon.className = 'fas fa-chevron-up';
+    } else {
+        details.style.display = 'none';
+        toggleText.textContent = 'Показать детали';
+        toggleIcon.className = 'fas fa-chevron-down';
+    }
+}
+
+function shareResult() {
+    const score = {{ quiz_stat.score }};
+    const total = {{ quiz_stat.total_questions }};
+    const percentage = {{ ((quiz_stat.score / quiz_stat.total_questions) * 100) | round | int }};
+    const packTitle = "{{ pack.title }}";
+
+    const text = `Я прошел квиз "${packTitle}" и набрал ${score}/${total} баллов (${percentage}%)! 🎯`;
+
+    if (navigator.share) {
+        navigator.share({
+            title: 'Мой результат в QuizMaster',
+            text: text,
+            url: window.location.href
+        });
+    } else {
+        copyResult();
+        alert('Результат скопирован в буфер обмена!');
+    }
+}
+
+function copyResult() {
+    const score = {{ quiz_stat.score }};
+    const total = {{ quiz_stat.total_questions }};
+    const percentage = {{ ((quiz_stat.score / quiz_stat.total_questions) * 100) | round | int }};
+    const packTitle = "{{ pack.title }}";
+
+    const text = `Я прошел квиз "${packTitle}" и набрал ${score}/${total} баллов (${percentage}%)! 🎯\n\nПопробуй и ты: ${window.location.origin}`;
+
+    navigator.clipboard.writeText(text).then(() => {
+        const notification = document.createElement('div');
+        notification.className = 'copy-notification';
+        notification.textContent = 'Результат скопирован!';
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    });
+}
+</script>
+{% endblock %}

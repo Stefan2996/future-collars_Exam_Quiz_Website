@@ -71,7 +71,8 @@
             <div class="stats-content">
                 <i class="fas fa-trophy"></i>
                 <h3>Ваша статистика</h3>
-                <p>Правильных ответов: {{ user_stats.correct_answers }} из {{ user_stats.total_questions }}</p>
+                <p>Правильных ответов: {{ user_stats.total_correct_answers }} из {{ user_stats.total_questions_answered }}</p>
+                <p>Завершено квизов: {{ user_stats.total_games_played }}</p> {# Добавим и эту статистику #}
                 <a href="{{ url_for('profile') }}" class="btn btn-secondary">
                     Подробная статистика
                 </a>

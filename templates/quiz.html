@@ -57,7 +57,7 @@
 
 {# Скрытый скрипт-тег для передачи данных вопросов в JavaScript.
    'safe' используется, чтобы Jinja2 не экранировал кавычки в JSON-строке. #}
-<script id="quiz-data" type="application/json">
+<script id="quiz-data" type="application/json" data-pack-id="{{ pack.id }}">
     {{ questions_data_json | safe }}
 </script>
 
