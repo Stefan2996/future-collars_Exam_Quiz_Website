@@ -8,7 +8,8 @@
             <div class="panel-title h5 mt-10">Добавить Вопрос к "{{ quiz_pack.title }}"</div>
         </div>
         <div class="panel-body">
-            <form action="{{ url_for('admin_add_question', quiz_id=quiz_pack.id) }}" method="POST" class="form-horizontal">
+            {# ИСПРАВЛЕНО: 'admin_add_question' -> 'admin.add_question' #}
+            <form action="{{ url_for('admin.add_question', quiz_id=quiz_pack.id) }}" method="POST" class="form-horizontal">
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
                         <label class="form-label" for="question_text">Текст вопроса</label>
@@ -91,8 +92,10 @@
                                     {% endif %}
                                 </div>
                                 <div class="tile-action">
-                                    <a href="{{ url_for('admin_edit_question', question_id=question_item.id) }}" class="btn btn-link btn-sm">Редактировать</a>
-                                    <form action="{{ url_for('admin_delete_question', question_id=question_item.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Вы уверены, что хотите удалить этот вопрос?');">
+                                    {# ИСПРАВЛЕНО: 'admin_edit_question' -> 'admin.edit_question' #}
+                                    <a href="{{ url_for('admin.edit_question', question_id=question_item.id) }}" class="btn btn-link btn-sm">Редактировать</a>
+                                    {# ИСПРАВЛЕНО: 'admin_delete_question' -> 'admin.delete_question' #}
+                                    <form action="{{ url_for('admin.delete_question', question_id=question_item.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Вы уверены, что хотите удалить этот вопрос?');">
                                         <button type="submit" class="btn btn-error btn-sm">Удалить</button>
                                     </form>
                                 </div>
@@ -106,7 +109,8 @@
         </div>
 
         <div class="panel-footer text-center">
-            <a href="{{ url_for('admin_dashboard') }}">Вернуться к админ-панели</a>
+            {# ИСПРАВЛЕНО: 'admin_dashboard' -> 'admin.dashboard' #}
+            <a href="{{ url_for('admin.dashboard') }}">Вернуться к админ-панели</a>
         </div>
     </div>
 {% endblock %}

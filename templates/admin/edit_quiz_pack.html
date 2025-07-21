@@ -8,7 +8,8 @@
             <div class="panel-title h5 mt-10">Редактировать Квиз-Пак: "{{ quiz_pack.title }}"</div>
         </div>
         <div class="panel-body">
-            <form action="{{ url_for('admin_edit_quiz_pack', quiz_id=quiz_pack.id) }}" method="POST" class="form-horizontal">
+            {# ИСПРАВЛЕНО: 'admin_edit_quiz_pack' -> 'admin.edit_quiz_pack' #}
+            <form action="{{ url_for('admin.edit_quiz_pack', quiz_id=quiz_pack.id) }}" method="POST" class="form-horizontal">
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
                         <label class="form-label" for="title">Название квиз-пака</label>
@@ -33,7 +34,8 @@
             </form>
         </div>
         <div class="panel-footer text-center">
-            <a href="{{ url_for('admin_dashboard') }}">Вернуться к админ-панели</a>
+            {# ИСПРАВЛЕНО: 'admin_dashboard' -> 'admin.dashboard' #}
+            <a href="{{ url_for('admin.dashboard') }}">Вернуться к админ-панели</a>
         </div>
     </div>
 {% endblock %}

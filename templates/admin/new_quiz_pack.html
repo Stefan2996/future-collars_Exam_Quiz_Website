@@ -8,7 +8,7 @@
             <div class="panel-title h5 mt-10">Создать новый Квиз-Пак</div>
         </div>
         <div class="panel-body">
-            <form action="{{ url_for('admin_new_quiz_pack') }}" method="POST" class="form-horizontal">
+            <form action="{{ url_for('admin.new_quiz_pack') }}" method="POST" class="form-horizontal"> {# ИСПРАВЛЕНО #}
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
                         <label class="form-label" for="title">Название квиз-пака</label>
@@ -33,7 +33,7 @@
             </form>
         </div>
         <div class="panel-footer text-center">
-            <a href="{{ url_for('admin_dashboard') }}">Вернуться к админ-панели</a>
+            <a href="{{ url_for('admin.dashboard') }}">Вернуться к админ-панели</a> {# ИСПРАВЛЕНО #}
         </div>
     </div>
 {% endblock %}

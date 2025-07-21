@@ -13,12 +13,12 @@
                     Увлекательные квизы по различным темам. Соревнуйся с друзьями, отслеживай прогресс и становись экспертом!
                 </p>
                 <div class="hero-buttons">
-                    <a href="{{ url_for('packs') }}" class="btn btn-primary btn-large">
+                    <a href="{{ url_for('packs.packs') }}" class="btn btn-primary btn-large">
                         <i class="fas fa-bolt"></i>
                         Начать игру
                     </a>
-                    {% if not g.user %} {# <-- НОВОЕ УСЛОВИЕ: Показать кнопку "Создать аккаунт", только если пользователь НЕ залогинен #}
-                    <a href="{{ url_for('register') }}" class="btn btn-outline btn-large">
+                    {% if not current_user.is_authenticated %} {# ИСПРАВЛЕНО: 'g.user' -> 'current_user.is_authenticated' #}
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline btn-large"> {# ИСПРАВЛЕНО: 'register' -> 'auth.register' #}
                         Создать аккаунт
                     </a>
                     {% endif %}
@@ -55,16 +55,32 @@
         </div>
     </section>
 
+    {% if not current_user.is_authenticated %}
     <section class="cta">
         <div class="container">
             <div class="cta-card">
                 <h2>Готов принять вызов?</h2>
                 <p>Присоединяйся к тысячам игроков уже сейчас!</p>
-                <a href="{{ url_for('register') }}" class="btn btn-secondary btn-large">
-                    Начать бесплатно
+                <a href="{{ url_for('auth.register') }}" class="btn btn-secondary btn-large">
+                    Начать прямо сейчас
                 </a>
             </div>
         </div>
     </section>
+    {% else %}
+    {# Здесь будет контент для залогиненного пользователя #}
+    <section class="cta cta-logged-in"> {# Можно добавить отдельный класс для стилизации #}
+        <div class="container">
+            <div class="cta-card">
+                <h2>Продолжай совершенствоваться, {{ current_user.name }}!</h2> {# Пример использования имени пользователя #}
+                <p>Ваши знания — ваша сила. Приготовьтесь к новым вызовам!</p>
+                <a href="{{ url_for('packs.packs') }}" class="btn btn-secondary btn-large">
+                    <i class="fas fa-arrow-right"></i>
+                    Перейти к квизам
+                </a>
+            </div>
+        </div>
+    </section>
+    {% endif %}
 </div>
 {% endblock %}

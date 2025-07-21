@@ -8,7 +8,8 @@
             <div class="panel-title h5 mt-10">Редактировать Вопрос для "{{ quiz_pack.title }}"</div>
         </div>
         <div class="panel-body">
-            <form action="{{ url_for('admin_edit_question', question_id=question.id) }}" method="POST" class="form-horizontal">
+            {# ИСПРАВЛЕНО: 'admin_edit_question' -> 'admin.edit_question' #}
+            <form action="{{ url_for('admin.edit_question', question_id=question.id) }}" method="POST" class="form-horizontal">
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
                         <label class="form-label" for="question_text">Текст вопроса</label>
@@ -75,7 +76,8 @@
             </form>
         </div>
         <div class="panel-footer text-center">
-            <a href="{{ url_for('admin_add_question', quiz_id=quiz_pack.id) }}">Вернуться к вопросам квиз-пака</a>
+            {# ИСПРАВЛЕНО: 'admin_add_question' -> 'admin.add_question' #}
+            <a href="{{ url_for('admin.add_question', quiz_id=quiz_pack.id) }}">Вернуться к вопросам квиз-пака</a>
         </div>
     </div>
 {% endblock %}

@@ -1381,7 +1381,7 @@ html, body {
 
 .stat-content p {
   color: #6b7280;
-  font-size: 0.875rem;
+  font-size: 1.875rem;
 }
 
 .progress-bar.small {
@@ -1680,6 +1680,44 @@ html, body {
     color: #3b82f6; /* text-blue-500 */
 }
 
+/* Amber - Pack Master */
+.achievement-amber.unlocked {
+    border-color: #fcd34d; /* border-amber-300 - повторно используем как у yellow, но можно чуть изменить */
+    background-color: #fffbeb; /* bg-amber-50 - повторно используем как у yellow */
+}
+.achievement-amber .achievement-icon.unlocked-icon {
+    color: #f59e0b; /* text-amber-500 - повторно используем как у yellow */
+    /* Если хотите другой оттенок, можно подобрать */
+    /* color: #d97706; например, чуть темнее */
+}
+
+/* Red - Flawless */
+.achievement-red.unlocked {
+    border-color: #fca5a5; /* border-red-300 */
+    background-color: #fef2f2; /* bg-red-50 */
+}
+.achievement-red .achievement-icon.unlocked-icon {
+    color: #ef4444; /* text-red-500 */
+}
+
+/* Orange - Persistent Student */
+.achievement-orange.unlocked {
+    border-color: #fdba74; /* border-orange-300 */
+    background-color: #fff7ed; /* bg-orange-50 */
+}
+.achievement-orange .achievement-icon.unlocked-icon {
+    color: #f97316; /* text-orange-500 */
+}
+
+/* Teal - Sharpshooter Speed */
+.achievement-teal.unlocked {
+    border-color: #5eead4; /* border-teal-300 */
+    background-color: #f0fdfa; /* bg-teal-50 */
+}
+.achievement-teal .achievement-icon.unlocked-icon {
+    color: #14b8a6; /* text-teal-500 */
+}
+
 /* Empty state for achievements, if needed */
 .achievements-card .empty-state {
     padding: 2rem;
@@ -1726,4 +1764,72 @@ html, body {
     flex-direction: column;
     text-align: center;
   }
+}
+
+/* LOGIN PAGE */
+
+.form-group-checkbox {
+    display: flex;         /* Включаем Flexbox для выстраивания элементов в ряд */
+    align-items: center;   /* Выравниваем элементы по центру по вертикали */
+    gap: 8px;              /* Добавляем небольшой отступ между чекбоксом и текстом */
+    margin-top: 15px;      /* Отступ сверху, чтобы отделить от предыдущих полей */
+    margin-bottom: 15px;   /* Отступ снизу, если нужно */
+}
+
+/* Сброс стандартных отступов для самого чекбокса и его метки */
+.form-group-checkbox input[type="checkbox"] {
+    margin: 0;
+    padding: 0;
+    width: 16px;
+    height: 16px;
+}
+
+.form-group-checkbox label {
+    margin: 0;
+    padding: 0;
+    cursor: pointer; /* Делает текст кликабельным, что улучшает UX */
+}
+
+/* ADMIN PANEL */
+/* Пример базовых стилей для сетки и карточек */
+.quiz-packs-grid {
+    display: grid; /* Или display: flex; flex-wrap: wrap; */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 300px - минимальная ширина карточки */
+    gap: 20px; /* Отступ между карточками */
+    margin-top: 30px;
+}
+
+.quiz-pack-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Чтобы футер был внизу */
+    height: 100%; /* Чтобы все карточки были одинаковой высоты в сетке */
+}
+
+.quiz-pack-card .card-header,
+.quiz-pack-card .card-body,
+.quiz-pack-card .card-footer {
+    padding: 15px;
+}
+
+.quiz-pack-card .card-header {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.quiz-pack-card .card-title {
+    margin-bottom: 5px;
+}
+
+.quiz-pack-card .card-subtitle {
+    font-size: 0.9em;
+}
+
+.quiz-pack-card .card-footer {
+    border-top: 1px solid #f0f0f0;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }

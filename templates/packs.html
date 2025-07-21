@@ -59,21 +59,21 @@
                         ~{{ (pack.questions_data | length * 0.5) | round | int }} мин
                     </div>
                 </div>
-                <a href="{{ url_for('quiz', pack_id=pack.id) }}" class="btn btn-primary btn-full">
+                <a href="{{ url_for('quiz.quiz', pack_id=pack.id) }}" class="btn btn-primary btn-full"> {# Changed to quiz.quiz #}
                     Начать квиз
                 </a>
             </div>
             {% endfor %}
         </div>
 
-        {% if user and user_stats %}
+        {% if current_user.is_authenticated and user_stats %} {# Changed to current_user.is_authenticated #}
         <div class="user-stats-card">
             <div class="stats-content">
                 <i class="fas fa-trophy"></i>
                 <h3>Ваша статистика</h3>
                 <p>Правильных ответов: {{ user_stats.total_correct_answers }} из {{ user_stats.total_questions_answered }}</p>
                 <p>Завершено квизов: {{ user_stats.total_games_played }}</p> {# Добавим и эту статистику #}
-                <a href="{{ url_for('profile') }}" class="btn btn-secondary">
+                <a href="{{ url_for('auth.profile') }}" class="btn btn-secondary"> {# Changed to auth.profile #}
                     Подробная статистика
                 </a>
             </div>

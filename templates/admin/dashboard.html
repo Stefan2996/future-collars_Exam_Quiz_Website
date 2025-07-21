@@ -3,37 +3,49 @@
 {% block title %}Админ-панель{% endblock %}
 
 {% block content %}
+<div class="admin-dashboard-container">
     <div class="panel">
         <div class="panel-header text-center">
-            <div class="panel-title h5 mt-10">Управление Квиз-Паками</div>
+            <h2 class="panel-title h3 mt-10">Управление Квиз-Паками</h2>
         </div>
         <div class="panel-body">
-            <a href="{{ url_for('admin_new_quiz_pack') }}" class="btn btn-primary mb-2">Создать новый квиз-пак</a>
-            
+            <div class="text-center mb-4">
+                <a href="{{ url_for('admin.new_quiz_pack') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus-circle mr-1"></i> Создать новый квиз-пак
+                </a>
+            </div>
+
             {% if quiz_packs %}
-                <ul class="list-group">
+                <div class="quiz-packs-grid"> {# Используем сетку для лучшего отображения #}
                     {% for pack in quiz_packs %}
-                        <li class="list-group-item">
-                            <div class="tile tile-centered">
-                                <div class="tile-content">
-                                    <p class="tile-title h6">{{ pack.title }}</p>
-                                    <p class="tile-subtitle">{{ pack.description }}</p>
-                                    <small>Вопросов: {{ pack.questions|length }}</small>
-                                </div>
-                                <div class="tile-action">
-                                    <a href="{{ url_for('admin_add_question', quiz_id=pack.id) }}" class="btn btn-primary btn-sm">Добавить вопрос</a>
-                                    <a href="{{ url_for('admin_edit_quiz_pack', quiz_id=pack.id) }}" class="btn btn-link btn-sm">Редактировать</a>
-                                    <form action="{{ url_for('admin_delete_quiz_pack', quiz_id=pack.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Вы уверены, что хотите удалить квиз-пак &quot;{{ pack.title }}&quot; и все его вопросы/статистику?');">
-                                        <button type="submit" class="btn btn-error btn-sm">Удалить</button>
-                                    </form>
-                                </div>
+                        <div class="card quiz-pack-card"> {# Карточка для каждого квиз-пака #}
+                            <div class="card-header">
+                                <h5 class="card-title">{{ pack.title }}</h5>
+                                <p class="card-subtitle text-gray text-small">{{ pack.description }}</p>
                             </div>
-                        </li>
+                            <div class="card-body">
+                                <p class="text-bold">Вопросов: <span class="badge">{{ pack.questions|length }}</span></p>
+                            </div>
+                            <div class="card-footer d-flex flex-wrap justify-content-between align-items-center"> {# Используем flexbox для кнопок #}
+                                <a href="{{ url_for('admin.add_question', quiz_id=pack.id) }}" class="btn btn-sm btn-primary mb-1 mr-1">
+                                    <i class="fas fa-plus mr-1"></i> Добавить вопрос
+                                </a>
+                                <a href="{{ url_for('admin.edit_quiz_pack', quiz_id=pack.id) }}" class="btn btn-sm btn-link mb-1 mr-1">
+                                    <i class="fas fa-edit mr-1"></i> Редактировать
+                                </a>
+                                <form action="{{ url_for('admin.delete_quiz_pack', quiz_id=pack.id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Вы уверены, что хотите удалить квиз-пак &quot;{{ pack.title }}&quot; и все его вопросы/статистику?');">
+                                    <button type="submit" class="btn btn-sm btn-error mb-1">
+                                        <i class="fas fa-trash-alt mr-1"></i> Удалить
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     {% endfor %}
-                </ul>
+                </div>
             {% else %}
-                <p class="text-center">Пока нет созданных квиз-паков.</p>
+                <p class="empty-state text-center mt-4">Пока нет созданных квиз-паков. Начните с создания первого!</p>
             {% endif %}
         </div>
     </div>
+</div>
 {% endblock %}

@@ -1,5 +1,4 @@
-<!-- Header -->
-    <header class="header">
+<header class="header">
         <div class="container">
             <div class="header-content">
                 <a href="{{ url_for('index') }}" class="logo">
@@ -7,17 +6,17 @@
                     <span>QuizMaster</span>
                 </a>
                 <div class="header-actions">
-                    {% if user %}
-                        <a href="{{ url_for('profile') }}" class="btn btn-outline">
+                    {% if current_user.is_authenticated %} {# Используем current_user из Flask-Login #}
+                        <a href="{{ url_for('auth.profile') }}" class="btn btn-outline"> {# Изменено на auth.profile #}
                             <i class="fas fa-user"></i>
-                            {{ user.name }}
+                            {{ current_user.name }} {# Используем current_user.name #}
                         </a>
-                        <a href="{{ url_for('logout') }}" class="btn btn-ghost btn-icon-logout">
+                        <a href="{{ url_for('auth.logout') }}" class="btn btn-ghost btn-icon-logout"> {# Изменено на auth.logout #}
                             <i class="fas fa-sign-out-alt"></i>
                         </a>
                     {% else %}
-                        <a href="{{ url_for('login') }}" class="btn btn-outline">Войти</a>
-                        <a href="{{ url_for('register') }}" class="btn btn-primary">Регистрация</a>
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Войти</a>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Регистрация</a> {# Изменено на auth.register #}
                     {% endif %}
                 </div>
             </div>

@@ -6,7 +6,7 @@
 <header class="header header-compact-padding">
     <div class="container">
         <div class="header-content">
-            <a href="{{ url_for('packs') }}" class="back-link">
+            <a href="{{ url_for('packs.packs') }}" class="back-link"> {# Изменено на packs.packs #}
                 <i class="fas fa-arrow-left"></i>
                 Назад к пакам
             </a>
@@ -169,15 +169,15 @@
             </div>
 
             <div class="action-buttons">
-                <a href="{{ url_for('quiz', pack_id=pack.id) }}" class="btn btn-primary">
+                <a href="{{ url_for('quiz.quiz', pack_id=pack.id) }}" class="btn btn-primary"> {# Изменено на quiz.quiz #}
                     <i class="fas fa-redo"></i>
                     Пройти снова
                 </a>
-                <a href="{{ url_for('packs') }}" class="btn btn-outline">
+                <a href="{{ url_for('packs.packs') }}" class="btn btn-outline"> {# Изменено на packs.packs #}
                     <i class="fas fa-th-large"></i>
                     Другие паки
                 </a>
-                <a href="{{ url_for('profile') }}" class="btn btn-secondary">
+                <a href="{{ url_for('auth.profile') }}" class="btn btn-secondary"> {# Изменено на auth.profile #}
                     <i class="fas fa-user"></i>
                     Мой профиль
                 </a>

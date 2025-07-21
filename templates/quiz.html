@@ -6,7 +6,7 @@
 <header class="header header-compact-padding">
     <div class="container">
         <div class="header-content">
-            <a href="{{ url_for('packs') }}" class="back-link">
+            <a href="{{ url_for('packs.packs') }}" class="back-link"> {# Изменено на packs.packs #}
                 <i class="fas fa-arrow-left"></i>
                 Назад к пакам
             </a>
@@ -61,4 +61,144 @@
     {{ questions_data_json | safe }}
 </script>
 
+{# В этом "откате" основной JS-код квиза ЕЩЕ НАХОДИТСЯ ЗДЕСЬ, а не в main.js #}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const quizDataScript = document.getElementById("quiz-data");
+        if (!quizDataScript) {
+            return; // Не на странице квиза
+        }
+
+        const quizData = JSON.parse(quizDataScript.textContent);
+        const questions = quizData.questions;
+        const packId = quizData.pack_id;
+
+        let currentQuestionIndex = 0;
+        const userAnswers = []; // [{questionId: ID, selectedAnswerIndex: INDEX}, ...]
+        let quizStartTime = Date.now(); // Записываем время начала квиза
+
+        const questionTextElement = document.getElementById("question-text");
+        const answersContainer = document.getElementById("answers-container");
+        const selectedAnswerInput = document.getElementById("selected-answer-input");
+        const nextQuestionBtn = document.getElementById("next-question-btn");
+        const finishQuizBtn = document.getElementById("finish-quiz-btn");
+        const questionCounter = document.getElementById("question-counter");
+        const progressPercentageSpan = document.getElementById("progress-percentage");
+        const progressBarFill = document.querySelector(".progress-bar .progress-fill");
+
+        function renderQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                showResults();
+                return;
+            }
+
+            const currentQuestion = questions[currentQuestionIndex];
+            questionTextElement.textContent = currentQuestion.question;
+
+            answersContainer.innerHTML = "";
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.classList.add("answer-btn");
+                button.dataset.answerIndex = index;
+                button.dataset.questionId = currentQuestion.id;
+                button.innerHTML = `<span class="answer-letter">${String.fromCharCode(65 + index)}.</span><span class="answer-text">${option}</span>`;
+
+                button.addEventListener("click", () => {
+                    answersContainer.querySelectorAll(".answer-btn").forEach(btn => btn.classList.remove("selected"));
+                    button.classList.add("selected");
+                    selectedAnswerInput.value = button.dataset.answerIndex;
+                    nextQuestionBtn.disabled = false;
+                });
+                answersContainer.appendChild(button);
+            });
+
+            selectedAnswerInput.value = "";
+            nextQuestionBtn.disabled = true;
+
+            updateProgress();
+
+            if (currentQuestionIndex === questions.length - 1) {
+                nextQuestionBtn.textContent = "Завершить квиз";
+            } else {
+                nextQuestionBtn.textContent = "Следующий вопрос";
+            }
+        }
+
+        function updateProgress() {
+            const total = questions.length;
+            const current = currentQuestionIndex;
+            const percentage = total > 0 ? (current / total) * 100 : 0;
+
+            questionCounter.textContent = `Вопрос ${current + 1} из ${total}`;
+            progressPercentageSpan.textContent = `Прогресс: ${percentage.toFixed(0)}%`;
+            progressBarFill.style.width = `${percentage}%`;
+        }
+
+        function showResults() {
+            questionTextElement.textContent = "Квиз завершен! Сохранение результатов...";
+            answersContainer.innerHTML = "";
+            nextQuestionBtn.style.display = "none";
+            finishQuizBtn.style.display = "none";
+            selectedAnswerInput.value = "";
+
+            questionCounter.textContent = "Квиз завершен!";
+            progressPercentageSpan.textContent = "Прогресс: 100%";
+            progressBarFill.style.width = "100%";
+
+            submitQuizResults();
+        }
+
+        async function submitQuizResults() {
+            const quizEndTime = Date.now();
+            const totalTimeTaken = (quizEndTime - quizStartTime) / 1000; // Время в секундах
+
+            try {
+                const response = await fetch("{{ url_for('quiz.submit_quiz') }}", { {# Изменено на quiz.submit_quiz #}
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        pack_id: packId,
+                        answers: userAnswers,
+                        totalTimeTaken: totalTimeTaken // Передаем общее время
+                    }),
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    window.location.href = result.redirect_url;
+                } else {
+                    alert(`Ошибка: ${result.message}`);
+                    window.location.href = "{{ url_for('packs.packs') }}"; {# Изменено на packs.packs #}
+                }
+            } catch (error) {
+                console.error("Error submitting quiz:", error);
+                alert("Произошла ошибка при отправке результатов квиза.");
+                window.location.href = "{{ url_for('packs.packs') }}"; {# Изменено на packs.packs #}
+            }
+        }
+
+        nextQuestionBtn.addEventListener("click", () => {
+            const selectedAnswer = selectedAnswerInput.value;
+            const currentQuestion = questions[currentQuestionIndex];
+
+            if (selectedAnswer === "") {
+                return;
+            }
+
+            userAnswers.push({
+                questionId: currentQuestion.id,
+                selectedAnswerIndex: parseInt(selectedAnswer)
+            });
+
+            currentQuestionIndex++;
+            renderQuestion();
+        });
+
+        renderQuestion();
+    });
+</script>
 {% endblock %}

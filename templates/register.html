@@ -44,7 +44,7 @@
             </form>
 
             <div class="auth-footer">
-                <p>Уже есть аккаунт? <a href="{{ url_for('login') }}">Войти</a></p>
+                <p>Уже есть аккаунт? <a href="{{ url_for('auth.login') }}">Войти</a></p> {# Изменено на auth.login #}
                 <a href="{{ url_for('index') }}" class="back-link">← Вернуться на главную</a>
             </div>
         </div>
