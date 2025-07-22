@@ -3,49 +3,64 @@
 {% block title %}Админ-панель{% endblock %}
 
 {% block content %}
-<div class="admin-dashboard-container">
-    <div class="panel">
-        <div class="panel-header text-center">
-            <h2 class="panel-title h3 mt-10">Управление Квиз-Паками</h2>
+<div class="packs-bg"> {# Используем packs-bg для единообразия фона и отступов #}
+    <div class="container">
+        <div class="page-header"> {# Используем page-header для заголовка #}
+            <h1>Управление Квиз-Паками</h1>
+            <p>Создавайте, редактируйте и удаляйте квиз-паки и вопросы</p>
         </div>
-        <div class="panel-body">
-            <div class="text-center mb-4">
-                <a href="{{ url_for('admin.new_quiz_pack') }}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-plus-circle mr-1"></i> Создать новый квиз-пак
-                </a>
-            </div>
 
-            {% if quiz_packs %}
-                <div class="quiz-packs-grid"> {# Используем сетку для лучшего отображения #}
-                    {% for pack in quiz_packs %}
-                        <div class="card quiz-pack-card"> {# Карточка для каждого квиз-пака #}
-                            <div class="card-header">
-                                <h5 class="card-title">{{ pack.title }}</h5>
-                                <p class="card-subtitle text-gray text-small">{{ pack.description }}</p>
+        <div class="text-center mb-4">
+            <a href="{{ url_for('admin.new_quiz_pack') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus-circle mr-1"></i> Создать новый квиз-пак
+            </a>
+        </div>
+
+        {% if quiz_packs %}
+            <div class="packs-grid"> {# Используем packs-grid для той же адаптивной сетки #}
+                {% for pack in quiz_packs %}
+                    <div class="pack-card"> {# Копируем структуру pack-card #}
+                        <div class="pack-content"> {# Оборачиваем весь контент, кроме футера #}
+                            <div class="pack-header">
+                                <div class="pack-indicator {{ pack.color }}"></div>
+                                <div class="difficulty-badge difficulty-{{ pack.difficulty }}"> {# Проверьте регистр, если надо .lower() #}
+                                    {{ pack.difficulty }}
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <p class="text-bold">Вопросов: <span class="badge">{{ pack.questions|length }}</span></p>
+                            <h3>{{ pack.title }}</h3>
+                            <p class="pack-description">{{ pack.description }}</p> {# Класс для выравнивания #}
+                            <div class="pack-info">
+                                <div class="pack-stat">
+                                    <i class="fas fa-question-circle"></i>
+                                    {{ pack.questions | length }} вопросов
+                                </div>
+                                <div class="pack-stat">
+                                    <i class="fas fa-clock"></i>
+                                    ~{{ pack.time_to_complete_minutes }} мин
+                                </div>
                             </div>
-                            <div class="card-footer d-flex flex-wrap justify-content-between align-items-center"> {# Используем flexbox для кнопок #}
-                                <a href="{{ url_for('admin.add_question', quiz_id=pack.id) }}" class="btn btn-sm btn-primary mb-1 mr-1">
-                                    <i class="fas fa-plus mr-1"></i> Добавить вопрос
+                        </div> {# Конец pack-content #}
+                        <div class="pack-footer admin-pack-footer"> {# НОВЫЙ КЛАСС для стилизации футера админа #}
+                            <div class="admin-button-group"> {# Группа для кнопок админа #}
+                                <a href="{{ url_for('admin.add_question', quiz_id=pack.id) }}" class="btn btn-primary btn-full admin-btn-action">
+                                    <i class="fas fa-plus mr-1"></i> Add / Edit Question
                                 </a>
-                                <a href="{{ url_for('admin.edit_quiz_pack', quiz_id=pack.id) }}" class="btn btn-sm btn-link mb-1 mr-1">
-                                    <i class="fas fa-edit mr-1"></i> Редактировать
+                                <a href="{{ url_for('admin.edit_quiz_pack', quiz_id=pack.id) }}" class="btn btn-secondary btn-full admin-btn-action">
+                                    <i class="fas fa-edit mr-1"></i> Редактировать пак
                                 </a>
-                                <form action="{{ url_for('admin.delete_quiz_pack', quiz_id=pack.id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Вы уверены, что хотите удалить квиз-пак &quot;{{ pack.title }}&quot; и все его вопросы/статистику?');">
-                                    <button type="submit" class="btn btn-sm btn-error mb-1">
+                                <form action="{{ url_for('admin.delete_quiz_pack', quiz_id=pack.id) }}" method="POST" onsubmit="return confirm('Вы уверены, что хотите удалить квиз-пак &quot;{{ pack.title }}&quot; и все его вопросы/статистику?');">
+                                    <button type="submit" class="btn btn-error btn-full admin-btn-action">
                                         <i class="fas fa-trash-alt mr-1"></i> Удалить
                                     </button>
                                 </form>
                             </div>
                         </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p class="empty-state text-center mt-4">Пока нет созданных квиз-паков. Начните с создания первого!</p>
-            {% endif %}
-        </div>
+                    </div> {# Конец pack-card #}
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="empty-state text-center mt-4">Пока нет созданных квиз-паков. Начните с создания первого!</p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

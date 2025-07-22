@@ -3,12 +3,12 @@
 {% block title %}Новый Квиз-Пак{% endblock %}
 
 {% block content %}
-    <div class="panel">
+    <div class="container">
         <div class="panel-header text-center">
             <div class="panel-title h5 mt-10">Создать новый Квиз-Пак</div>
         </div>
         <div class="panel-body">
-            <form action="{{ url_for('admin.new_quiz_pack') }}" method="POST" class="form-horizontal"> {# ИСПРАВЛЕНО #}
+            <form action="{{ url_for('admin.new_quiz_pack') }}" method="POST" class="form-horizontal">
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
                         <label class="form-label" for="title">Название квиз-пака</label>
@@ -22,7 +22,39 @@
                         <label class="form-label" for="description">Описание</label>
                     </div>
                     <div class="col-9 col-sm-12">
-                        <textarea class="form-input" id="description" name="description" placeholder="Краткое описание квиза (необязательно)"></textarea>
+                        <textarea class="form-input" id="description" name="description" placeholder="Краткое описание квиза (необязательно)" rows="10" cols="50"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="color">Цвет пака (например, blue, green, red, yellow):</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        {# Используем value="{{ request.form.color if request.method == 'POST' else 'blue' }}" для сохранения значения при ошибке #}
+                        <input class="form-input" type="text" id="color" name="color" value="{{ request.form.color if request.method == 'POST' else 'blue' }}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="difficulty">Сложность пака:</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <select id="difficulty" name="difficulty" class="form-input">
+                            {# Используем selected для сохранения выбранного значения при ошибке #}
+                            <option value="Легкий" {% if request.form.difficulty == 'Легкий' %}selected{% endif %}>Легкий</option>
+                            <option value="Средний" {% if request.form.difficulty == 'Средний' %}selected{% endif %}>Средний</option>
+                            <option value="Сложный" {% if request.form.difficulty == 'Сложный' %}selected{% endif %}>Сложный</option>
+                            <option value="Эксперт" {% if request.form.difficulty == 'Эксперт' %}selected{% endif %}>Эксперт</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="time_to_complete_minutes">Предполагаемое время прохождения (минуты):</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        {# Используем value="{{ request.form.time_to_complete_minutes if request.method == 'POST' else '10' }}" для сохранения значения при ошибке #}
+                        <input class="form-input" type="number" id="time_to_complete_minutes" name="time_to_complete_minutes" value="{{ request.form.time_to_complete_minutes if request.method == 'POST' else '10' }}" min="1" required>
                     </div>
                 </div>
                 <div class="form-group">
@@ -33,7 +65,7 @@
             </form>
         </div>
         <div class="panel-footer text-center">
-            <a href="{{ url_for('admin.dashboard') }}">Вернуться к админ-панели</a> {# ИСПРАВЛЕНО #}
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">Вернуться к админ-панели</a>
         </div>
     </div>
 {% endblock %}

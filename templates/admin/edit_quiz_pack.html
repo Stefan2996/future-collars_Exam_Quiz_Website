@@ -3,12 +3,11 @@
 {% block title %}Редактировать Квиз-Пак{% endblock %}
 
 {% block content %}
-    <div class="panel">
+    <div class="container">
         <div class="panel-header text-center">
             <div class="panel-title h5 mt-10">Редактировать Квиз-Пак: "{{ quiz_pack.title }}"</div>
         </div>
         <div class="panel-body">
-            {# ИСПРАВЛЕНО: 'admin_edit_quiz_pack' -> 'admin.edit_quiz_pack' #}
             <form action="{{ url_for('admin.edit_quiz_pack', quiz_id=quiz_pack.id) }}" method="POST" class="form-horizontal">
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
@@ -23,7 +22,36 @@
                         <label class="form-label" for="description">Описание</label>
                     </div>
                     <div class="col-9 col-sm-12">
-                        <textarea class="form-input" id="description" name="description">{{ quiz_pack.description }}</textarea>
+                        <textarea class="form-input" id="description" name="description" rows="10" cols="50">{{ quiz_pack.description }}</textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="color">Цвет пака (например, blue, green, red, yellow):</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <input class="form-input" type="text" id="color" name="color" value="{{ quiz_pack.color }}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="difficulty">Сложность пака:</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <select id="difficulty" name="difficulty" class="form-input">
+                            <option value="Легкий" {% if quiz_pack.difficulty == 'Легкий' %}selected{% endif %}>Легкий</option>
+                            <option value="Средний" {% if quiz_pack.difficulty == 'Средний' %}selected{% endif %}>Средний</option>
+                            <option value="Сложный" {% if quiz_pack.difficulty == 'Сложный' %}selected{% endif %}>Сложный</option>
+                            <option value="Эксперт" {% if quiz_pack.difficulty == 'Эксперт' %}selected{% endif %}>Эксперт</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-3 col-sm-12">
+                        <label class="form-label" for="time_to_complete_minutes">Предполагаемое время прохождения (минуты):</label>
+                    </div>
+                    <div class="col-9 col-sm-12">
+                        <input class="form-input" type="number" id="time_to_complete_minutes" name="time_to_complete_minutes" value="{{ quiz_pack.time_to_complete_minutes }}" min="1" required>
                     </div>
                 </div>
                 <div class="form-group">
@@ -34,8 +62,7 @@
             </form>
         </div>
         <div class="panel-footer text-center">
-            {# ИСПРАВЛЕНО: 'admin_dashboard' -> 'admin.dashboard' #}
-            <a href="{{ url_for('admin.dashboard') }}">Вернуться к админ-панели</a>
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">Вернуться к админ-панели</a>
         </div>
     </div>
 {% endblock %}

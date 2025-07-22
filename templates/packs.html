@@ -4,76 +4,51 @@
 
 {% block content %}
 <div class="packs-bg">
-    {# Хедер теперь наследуется от base.html, поэтому удаляем его отсюда #}
-    {#
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <a href="{{ url_for('index') }}" class="logo">
-                    <i class="fas fa-brain"></i>
-                    <span>QuizMaster</span>
-                </a>
-                <div class="header-actions">
-                    {% if user %}
-                        <a href="{{ url_for('profile') }}" class="btn btn-outline">
-                            <i class="fas fa-user"></i>
-                            {{ user.name }}
-                        </a>
-                        <a href="{{ url_for('logout') }}" class="btn btn-ghost btn-icon-logout">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </a>
-                    {% else %}
-                        <a href="{{ url_for('login') }}" class="btn btn-outline">Войти</a>
-                        <a href="{{ url_for('register') }}" class="btn btn-primary">Регистрация</a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </header>
-    #}
-
     <div class="container">
         <div class="page-header">
             <h1>Выберите пак вопросов</h1>
             <p>Проверьте свои знания в различных областях</p>
         </div>
-
         <div class="packs-grid">
             {% for pack in packs %}
-            <div class="pack-card">
-                <div class="pack-header">
-                    <div class="pack-indicator {{ pack.color }}"></div>
-                    <div class="difficulty-badge difficulty-{{ pack.difficulty.lower() }}">
-                        {{ pack.difficulty }}
+            <div class="pack-card"> {# Основная карточка для флексбокса #}
+                <div class="pack-content"> {# Оборачиваем весь контент, кроме футера, для гибкости #}
+                    <div class="pack-header">
+                        <div class="pack-indicator {{ pack.color }}"></div>
+                        <div class="difficulty-badge difficulty-{{ pack.difficulty }}">
+                            {{ pack.difficulty }}
+                        </div>
                     </div>
+                    <h3>{{ pack.title }}</h3>
+                    <p class="pack-description">{{ pack.description }}</p>
+                    <div class="pack-info">
+                        <div class="pack-stat">
+                            <i class="fas fa-question-circle"></i>
+                            {{ pack.questions | length }} вопросов
+                        </div>
+                        <div class="pack-stat">
+                            <i class="fas fa-clock"></i>
+                            ~{{ pack.time_to_complete_minutes }} мин
+                        </div>
+                    </div>
+                </div> {# Конец pack-content #}
+                <div class="pack-footer"> {# Футер для кнопки #}
+                    <a href="{{ url_for('quiz.quiz', pack_id=pack.id) }}" class="btn btn-primary btn-full">
+                        Начать квиз
+                    </a>
                 </div>
-                <h3>{{ pack.title }}</h3>
-                <p>{{ pack.description }}</p>
-                <div class="pack-info">
-                    <div class="pack-stat">
-                        <i class="fas fa-target"></i>
-                        {{ pack.questions_data | length }} вопросов
-                    </div>
-                    <div class="pack-stat">
-                        <i class="fas fa-clock"></i>
-                        ~{{ (pack.questions_data | length * 0.5) | round | int }} мин
-                    </div>
-                </div>
-                <a href="{{ url_for('quiz.quiz', pack_id=pack.id) }}" class="btn btn-primary btn-full"> {# Changed to quiz.quiz #}
-                    Начать квиз
-                </a>
-            </div>
+            </div> {# Конец pack-card #}
             {% endfor %}
         </div>
 
-        {% if current_user.is_authenticated and user_stats %} {# Changed to current_user.is_authenticated #}
+        {% if current_user.is_authenticated and user_stats %}
         <div class="user-stats-card">
             <div class="stats-content">
                 <i class="fas fa-trophy"></i>
                 <h3>Ваша статистика</h3>
                 <p>Правильных ответов: {{ user_stats.total_correct_answers }} из {{ user_stats.total_questions_answered }}</p>
-                <p>Завершено квизов: {{ user_stats.total_games_played }}</p> {# Добавим и эту статистику #}
-                <a href="{{ url_for('auth.profile') }}" class="btn btn-secondary"> {# Changed to auth.profile #}
+                <p>Завершено квизов: {{ user_stats.total_games_played }}</p>
+                <a href="{{ url_for('auth.profile') }}" class="btn btn-secondary">
                     Подробная статистика
                 </a>
             </div>

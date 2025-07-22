@@ -36,6 +36,9 @@
         <div class="quiz-card">
             <div class="question-header">
                 <h2 id="question-text"></h2> {# Текст вопроса будет вставляться сюда JS #}
+                <div id="question-image-container" style="text-align: center; margin-top: 15px; margin-bottom: 15px;">
+                    {# Изображение будет вставляться сюда JS #}
+                </div>
             </div>
             <div class="answers-container" id="answers-container">
                 {# Варианты ответов будут динамически вставляться сюда JS #}
@@ -57,7 +60,7 @@
 
 {# Скрытый скрипт-тег для передачи данных вопросов в JavaScript.
    'safe' используется, чтобы Jinja2 не экранировал кавычки в JSON-строке. #}
-<script id="quiz-data" type="application/json" data-pack-id="{{ pack.id }}">
+<script id="quiz-data" type="application/json">
     {{ questions_data_json | safe }}
 </script>
 
@@ -78,6 +81,7 @@
         let quizStartTime = Date.now(); // Записываем время начала квиза
 
         const questionTextElement = document.getElementById("question-text");
+        const questionImageContainer = document.getElementById("question-image-container"); // Новый элемент
         const answersContainer = document.getElementById("answers-container");
         const selectedAnswerInput = document.getElementById("selected-answer-input");
         const nextQuestionBtn = document.getElementById("next-question-btn");
@@ -94,6 +98,40 @@
 
             const currentQuestion = questions[currentQuestionIndex];
             questionTextElement.textContent = currentQuestion.question;
+
+            // --- Добавляем логику для отображения изображения ---
+            questionImageContainer.innerHTML = ""; // Очищаем предыдущее изображение
+            if (currentQuestion.image_url) {
+                const img = document.createElement("img");
+                // Убедитесь, что URL для Flask статических файлов формируется правильно.
+                // Если image_url в БД хранится как "/static/path/to/img.jpg"
+                // то нам нужно убрать "/static/" из начала для url_for('static', filename=...)
+                // Если в БД хранится как "path/to/img.jpg", то просто используем
+
+                // В вашем admin.py вы сохраняете его как есть.
+                // Если image_url уже полный путь, например /static/img/...
+                // то для url_for('static', filename=...) нам нужно убрать '/static/'
+                // Например: /static/img/my_image.jpg -> img/my_image.jpg
+                const cleanImageUrl = currentQuestion.image_url.startsWith('/static/') ?
+                                      currentQuestion.image_url.substring(7) :
+                                      currentQuestion.image_url;
+
+                // Теперь используем url_for через fetch, чтобы получить реальный URL от Flask
+                fetch(`/static_url?filename=${encodeURIComponent(cleanImageUrl)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.url) {
+                            img.src = data.url;
+                            img.alt = "Изображение вопроса";
+                            img.style.maxWidth = "100%"; // Делаем изображение адаптивным
+                            img.style.height = "auto";
+                            img.style.maxHeight = "300px"; // Ограничиваем высоту
+                            questionImageContainer.appendChild(img);
+                        }
+                    })
+                    .catch(error => console.error("Ошибка при получении URL изображения:", error));
+            }
+            // --- Конец логики для отображения изображения ---
 
             answersContainer.innerHTML = "";
             currentQuestion.options.forEach((option, index) => {
@@ -137,6 +175,7 @@
 
         function showResults() {
             questionTextElement.textContent = "Квиз завершен! Сохранение результатов...";
+            questionImageContainer.innerHTML = ""; // Очищаем изображение
             answersContainer.innerHTML = "";
             nextQuestionBtn.style.display = "none";
             finishQuizBtn.style.display = "none";

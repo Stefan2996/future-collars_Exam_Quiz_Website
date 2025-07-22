@@ -1,26 +1,50 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, session, jsonify, request
 from flask_login import login_required, current_user
-from models import db, QuizPack, Question, UserQuizStat # Импортируем из models
+from models import db, QuizPack, Question, UserQuizStat  # Импортируем из models
 import json
 import random
 from datetime import datetime
 
 quiz_bp = Blueprint('quiz', __name__)
 
+
+@quiz_bp.route("/static_url")
+def static_url_generator():
+    filename = request.args.get('filename')
+    if filename:
+        return jsonify(url=url_for('static', filename=filename))
+    return jsonify(url=None)
+
+
 @quiz_bp.route("/quiz/<int:pack_id>")
 @login_required
 def quiz(pack_id):
     quiz_pack = QuizPack.query.get_or_404(pack_id)
-    all_questions_data = quiz_pack.questions_data
 
-    if not all_questions_data:
+    # Вместо quiz_pack.questions_data, мы будем получать объекты Question
+    # Это важно, потому что quiz_pack.questions_data может быть свойством,
+    # которое не содержит image_url, или обрабатывает его не так.
+    # Лучше явно получить вопросы из базы данных.
+    all_questions = Question.query.filter_by(quiz_pack_id=pack_id).all()
+
+    if not all_questions:
         flash(f"В квизе '{quiz_pack.title}' пока нет вопросов.", "info")
         return redirect(url_for('packs.packs'))
 
-    random.shuffle(all_questions_data)
+    # Преобразуем объекты Question в словарь для JS и сессии
+    all_questions_data = []
+    for q_obj in all_questions:
+        all_questions_data.append({
+            'id': q_obj.id,
+            'question': q_obj.question_text,
+            'options': q_obj.get_options(),  # Используем метод get_options()
+            'correct_answer': q_obj.correct_answer_index,
+            'image_url': q_obj.image_url  # Включаем image_url!
+        })
+
+    random.shuffle(all_questions_data)  # Перемешиваем вопросы
 
     # Храним вопросы в сессии для валидации при отправке результатов
-    # Ключи словаря должны быть строками, если они приходят из JSON/JS
     questions_map_for_session = {str(q['id']): {'correct_answer': q['correct_answer']} for q in all_questions_data}
     session['current_quiz_questions_map'] = questions_map_for_session
     session['current_quiz_pack_id'] = pack_id
@@ -28,11 +52,16 @@ def quiz(pack_id):
     # Для фронтенда мы передаем вопросы без поля 'correct_answer'
     js_data_for_template = {
         'pack_id': pack_id,
-        'questions': [{k: v for k, v in q.items() if k != 'correct_answer'} for q in all_questions_data]
+        'questions': [{
+            'id': q['id'],
+            'question': q['question'],
+            'options': q['options'],
+            'image_url': q['image_url']  # Убедитесь, что image_url здесь
+        } for q in all_questions_data]
     }
 
     total_questions = len(all_questions_data)
-    current_question_index = 0 # Всегда начинаем с первого вопроса
+    current_question_index = 0  # Всегда начинаем с первого вопроса
 
     return render_template("quiz.html",
                            pack=quiz_pack,
@@ -93,7 +122,7 @@ def submit_quiz():
         avg_time_per_question = total_time_taken / total_questions_in_pack
 
     new_user_quiz_stat = UserQuizStat(
-        user_id=current_user.id, # Используем current_user из Flask-Login
+        user_id=current_user.id,  # Используем current_user из Flask-Login
         quiz_pack_id=pack_id,
         score=score,
         total_questions=total_questions_in_pack,
@@ -114,6 +143,7 @@ def submit_quiz():
         db.session.rollback()
         print(f"Ошибка при сохранении результатов квиза: {e}")
         return jsonify({"success": False, "message": "Произошла ошибка при отправке результатов квиза."}), 500
+
 
 @quiz_bp.route("/quiz_results/<int:pack_id>/<int:quiz_stat_id>")
 @login_required
@@ -143,7 +173,9 @@ def quiz_results(pack_id, quiz_stat_id):
                     'options': options,
                     'user_selected_index': user_selected_index,
                     'is_correct': is_correct,
-                    'correct_answer_index': question_obj.correct_answer_index # Добавим для отображения правильного ответа
+                    'correct_answer_index': question_obj.correct_answer_index,
+                    # Добавим для отображения правильного ответа
+                    'image_url': question_obj.image_url  # Включаем image_url для результатов
                 })
             else:
                 results_data.append({

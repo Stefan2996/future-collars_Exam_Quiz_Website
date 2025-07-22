@@ -3,19 +3,18 @@
 {% block title %}Управление Вопросами к "{{ quiz_pack.title }}"{% endblock %}
 
 {% block content %}
-    <div class="panel">
+    <div class="container">
         <div class="panel-header text-center">
-            <div class="panel-title h5 mt-10">Добавить Вопрос к "{{ quiz_pack.title }}"</div>
+            <div class="panel-title h5 mt-10">Добавить Вопрос №{{ next_question_number }} к "{{ quiz_pack.title }}"</div>
         </div>
         <div class="panel-body">
-            {# ИСПРАВЛЕНО: 'admin_add_question' -> 'admin.add_question' #}
             <form action="{{ url_for('admin.add_question', quiz_id=quiz_pack.id) }}" method="POST" class="form-horizontal">
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
                         <label class="form-label" for="question_text">Текст вопроса</label>
                     </div>
                     <div class="col-9 col-sm-12">
-                        <textarea class="form-input" id="question_text" name="question_text" placeholder="Введите текст вопроса" required></textarea>
+                        <textarea class="form-input" id="question_text" name="question_text" placeholder="Введите текст вопроса" required rows="10" cols="50"></textarea>
                     </div>
                 </div>
                 <div class="form-group">
@@ -30,42 +29,42 @@
                 <div class="divider text-center" data-content="Варианты Ответов"></div>
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
-                        <label class="form-label" for="option_A">Вариант A</label>
+                        <label class="form-label" for="option_0">Вариант A</label> {# Метка теперь 'Вариант A' #}
                     </div>
                     <div class="col-9 col-sm-12">
-                        <input class="form-input" type="text" id="option_A" name="option_A" required>
+                        <input class="form-input" type="text" id="option_0" name="option_0" required> {# name="option_0" #}
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
-                        <label class="form-label" for="option_B">Вариант B</label>
+                        <label class="form-label" for="option_1">Вариант B</label> {# Метка теперь 'Вариант B' #}
                     </div>
                     <div class="col-9 col-sm-12">
-                        <input class="form-input" type="text" id="option_B" name="option_B" required>
+                        <input class="form-input" type="text" id="option_1" name="option_1" required> {# name="option_1" #}
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
-                        <label class="form-label" for="option_C">Вариант C</label>
+                        <label class="form-label" for="option_2">Вариант C</label> {# Метка теперь 'Вариант C' #}
                     </div>
                     <div class="col-9 col-sm-12">
-                        <input class="form-input" type="text" id="option_C" name="option_C" required>
+                        <input class="form-input" type="text" id="option_2" name="option_2" required> {# name="option_2" #}
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
-                        <label class="form-label" for="option_D">Вариант D</label>
+                        <label class="form-label" for="option_3">Вариант D</label> {# Метка теперь 'Вариант D' #}
                     </div>
                     <div class="col-9 col-sm-12">
-                        <input class="form-input" type="text" id="option_D" name="option_D" required>
+                        <input class="form-input" type="text" id="option_3" name="option_3" required> {# name="option_3" #}
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
-                        <label class="form-label" for="correct_answer">Правильный ответ (A, B, C, D)</label>
+                        <label class="form-label" for="correct_answer">Правильный ответ (A, B, C, D)</label> {# Имя поля и метка изменены #}
                     </div>
                     <div class="col-9 col-sm-12">
-                        <input class="form-input" type="text" id="correct_answer" name="correct_answer" pattern="[ABCD]" title="Введите A, B, C или D" required>
+                        <input class="form-input" type="text" id="correct_answer" name="correct_answer" pattern="[ABCDabcd]" title="Введите A, B, C или D" required> {# pattern для букв #}
                     </div>
                 </div>
                 <div class="form-group">
@@ -82,20 +81,27 @@
             {% if quiz_pack.questions %}
                 <ul class="list-group">
                     {% for question_item in quiz_pack.questions %}
-                        <li class="list-group-item">
+                        <li class="list-group-item" style="margin-bottom: 10px; border: 1px solid #e0e0e0; border-radius: 4px; padding: 15px;">
                             <div class="tile tile-centered">
                                 <div class="tile-content">
-                                    <p class="tile-title">{{ loop.index }}. {{ question_item.question_text }}</p>
-                                    <small>Правильный ответ: {{ question_item.correct_answer }}</small><br>
+                                    <p class="tile-title" style="font-weight: bold; margin-bottom: 5px;">{{ loop.index }}. {{ question_item.question_text }}</p>
+                                    {# Отображаем правильный ответ как букву и текст #}
+                                    {% set answer_letters = ['A', 'B', 'C', 'D'] %}
+                                    {% set options_list = question_item.get_options() %}
+                                    <small style="display: block; margin-bottom: 3px;">
+                                        Правильный ответ: {% if question_item.correct_answer_index is not none and question_item.correct_answer_index >= 0 and question_item.correct_answer_index < options_list|length %}
+                                            {{ answer_letters[question_item.correct_answer_index] }}. {{ options_list[question_item.correct_answer_index] }}
+                                        {% else %}
+                                            Индекс неверный ({{ question_item.correct_answer_index }})
+                                        {% endif %}
+                                    </small><br>
                                     {% if question_item.image_url %}
-                                    <small>Изображение: {{ question_item.image_url }}</small>
+                                    <small style="display: block;">Изображение: {{ question_item.image_url }}</small>
                                     {% endif %}
                                 </div>
-                                <div class="tile-action">
-                                    {# ИСПРАВЛЕНО: 'admin_edit_question' -> 'admin.edit_question' #}
+                                <div class="tile-action" style="display: flex; gap: 8px; align-items: center;">
                                     <a href="{{ url_for('admin.edit_question', question_id=question_item.id) }}" class="btn btn-link btn-sm">Редактировать</a>
-                                    {# ИСПРАВЛЕНО: 'admin_delete_question' -> 'admin.delete_question' #}
-                                    <form action="{{ url_for('admin.delete_question', question_id=question_item.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Вы уверены, что хотите удалить этот вопрос?');">
+                                    <form action="{{ url_for('admin.delete_question', question_id=question_item.id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Вы уверены, что хотите удалить этот вопрос?');">
                                         <button type="submit" class="btn btn-error btn-sm">Удалить</button>
                                     </form>
                                 </div>
@@ -109,8 +115,7 @@
         </div>
 
         <div class="panel-footer text-center">
-            {# ИСПРАВЛЕНО: 'admin_dashboard' -> 'admin.dashboard' #}
-            <a href="{{ url_for('admin.dashboard') }}">Вернуться к админ-панели</a>
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">Вернуться к админ-панели</a>
         </div>
     </div>
 {% endblock %}

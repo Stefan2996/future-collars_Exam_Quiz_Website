@@ -616,19 +616,24 @@ html, body {
   font-weight: 500;
 }
 
-.difficulty-легкий {
+.difficulty-Легкий {
   background: #d1fae5;
   color: #065f46;
 }
 
-.difficulty-средний {
+.difficulty-Средний {
   background: #fef3c7;
   color: #92400e;
 }
 
-.difficulty-сложный {
+.difficulty-Сложный {
   background: #fee2e2;
   color: #991b1b;
+}
+
+.difficulty-Эксперт {
+    color: #fff;
+    background-color: #212121; /* Черный */
 }
 
 .pack-card h3 {
@@ -864,6 +869,12 @@ html, body {
 .pack-description {
     color: #707b8b;
     font-size: 1em;
+    /* Можно задать min-height или max-height, чтобы выровнять высоту для текста */
+    min-height: 60px; /* Пример: 3 строки текста по 20px */
+    /* Или max-height с overflow: hidden для обрезки длинных описаний */
+    /* max-height: 80px;
+    overflow: hidden; */
+    margin-bottom: 10px; /* Отступ от мета-информации */
 }
 
 .pack-details-grid {
@@ -1791,6 +1802,44 @@ html, body {
 }
 
 /* ADMIN PANEL */
+
+.admin-dashboard-container {
+    /* Уже центрируется благодаря .container в base.html,
+       но можно добавить еще немного верхнего/нижнего отступа, если .main-content недостаточно */
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.panel {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Мягкая тень */
+    padding: 0; /* Сброс внутренних отступов, если они были */
+    margin-bottom: 30px; /* Отступ снизу, если за панелью есть еще контент */
+}
+
+.panel-header {
+    background-color: #f0f4f7; /* Легкий фон для заголовка панели */
+    padding: 20px 25px;
+    border-bottom: 1px solid #e0e0e0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.panel-title {
+    color: #34495e; /* Темный цвет текста для заголовка */
+    font-size: 1.8em; /* Немного крупнее */
+    margin: 0; /* Убираем стандартные отступы заголовка */
+}
+
+.panel-body {
+    padding: 25px; /* Добавим хороший отступ внутри тела панели */
+}
+
+.panel-footer {
+    margin-bottom: 90px;
+}
+
 /* Пример базовых стилей для сетки и карточек */
 .quiz-packs-grid {
     display: grid; /* Или display: flex; flex-wrap: wrap; */
@@ -1828,8 +1877,164 @@ html, body {
     font-size: 0.9em;
 }
 
-.quiz-pack-card .card-footer {
-    border-top: 1px solid #f0f0f0;
-    padding-top: 10px;
-    padding-bottom: 10px;
+/* --- Стили для футера карточки с кнопками --- */
+
+.quiz-pack-card .custom-card-footer {
+    padding: 15px 20px; /* Внутренние отступы футера */
+    border-top: 1px solid #e0e0e0;
+    background-color: #f9fbfb;
+    display: flex; /* Делаем футер Flex-контейнером */
+    flex-direction: column; /* Элементы внутри футера выстраиваются в колонку */
+    align-items: stretch; /* Дочерние элементы растягиваются на всю ширину футера */
+    gap: 10px; /* Отступ между группами кнопок (верхняя и нижняя) */
+}
+
+
+/* Группа для кнопки "Добавить вопрос" */
+.quiz-pack-card .custom-card-footer .button-group-action {
+    width: 100%; /* Группа занимает всю ширину футера */
+    display: flex; /* Делаем эту группу Flex-контейнером */
+    justify-content: center; /* Центрируем кнопку внутри этой группы */
+    align-items: center; /* Выравнивание по вертикали (на всякий случай) */
+}
+
+/* Стили для кнопки "Добавить вопрос" */
+.quiz-pack-card .custom-card-footer .custom-btn-full {
+    display: block; /* Делаем кнопку блочным элементом */
+    width: 100%; /* Кнопка занимает всю ширину своей группы */
+    margin: 0 !important; /* Обнуляем все внешние отступы */
+    text-align: center; /* Центрируем текст внутри кнопки */
+}
+
+/* Группа для кнопок "Редактировать" и "Удалить" */
+.quiz-pack-card .custom-card-footer .button-group-controls {
+    width: 100%; /* Группа занимает всю ширину футера */
+    display: flex; /* Делаем эту группу Flex-контейнером */
+    justify-content: flex-end; /* Выравниваем кнопки внутри группы по правому краю */
+    gap: 10px; /* Отступ между кнопками "Редактировать" и "Удалить" */
+    align-items: center; /* Выравнивание по вертикали (на всякий случай) */
+}
+
+/* Стили для кнопок "Редактировать" и "Удалить" */
+.quiz-pack-card .custom-card-footer .custom-btn-small {
+    margin: 0 !important; /* Обнуляем все внешние отступы */
+    flex-shrink: 0; /* Не сжимать кнопку */
+    /* width: auto; /* Ширина по содержимому */
+}
+
+/* Стили для формы кнопки "Удалить" */
+.quiz-pack-card .custom-card-footer .custom-delete-form {
+    display: flex; /* Делаем форму Flex-контейнером */
+    margin: 0 !important; /* Обнуляем все внешние отступы формы */
+}
+
+/* Если Spectre.css или другие фреймворки дают отступы к элементам i,
+   можно убрать их, чтобы иконка была ближе к тексту */
+.quiz-pack-card .custom-card-footer .btn i.fas {
+    margin-right: 5px; /* Немного уменьшим отступ, если mr-1 слишком большой */
+}
+
+/* Стили для кнопок внутри карточки (уже должны быть, но можно уточнить) */
+.quiz-pack-card .btn {
+    padding: 6px 12px;
+    font-size: 0.85em;
+    border-radius: 5px;
+    white-space: nowrap; /* Чтобы кнопки не переносились на новую строку */
+}
+.quiz-pack-card .btn-primary {
+    background-color: #3498db;
+    border-color: #3498db;
+    color: white;
+}
+.quiz-pack-card .btn-primary:hover {
+    background-color: #2980b9;
+    border-color: #2980b9;
+}
+.quiz-pack-card .btn-link {
+    color: #3498db;
+    text-decoration: none;
+}
+.quiz-pack-card .btn-link:hover {
+    text-decoration: underline;
+}
+.quiz-pack-card .btn-error {
+    background-color: #e74c3c;
+    border-color: #e74c3c;
+    color: white;
+}
+.quiz-pack-card .btn-error:hover {
+    background-color: #c0392b;
+    border-color: #c0392b;
+}
+
+/* Стиль для сообщения об отсутствии квиз-паков */
+.empty-state {
+    padding: 40px;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+    background-color: #fcfcfc;
+    color: #666;
+    font-size: 1.1em;
+}
+
+/* Утилитарные классы (если они не определены) */
+.text-center { text-align: center; }
+.mb-4 { margin-bottom: 1.5rem; } /* ~24px */
+.mt-10 { margin-top: 10px; }
+.mr-1 { margin-right: 0.25rem; } /* ~4px */
+
+/* Стили для иконок FontAwesome */
+.fas {
+    margin-right: 5px; /* Небольшой отступ справа от иконки */
+}
+
+/* Дополнительные стили для форм (если используются Spectre.css, у них уже есть) */
+.form-group {
+    margin-bottom: 15px;
+}
+.form-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Важно, чтобы padding не увеличивал ширину */
+}
+.form-input:focus, .form-textarea:focus {
+    border-color: #3284e7;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(50, 132, 231, 0.2);
+}
+
+/* --- Стили для админ-футера карточки --- */
+
+.admin-pack-footer {
+    padding: 0 20px 20px; /* Сохраняем отступы как в pack-footer */
+    margin-top: auto; /* Прижимает футер к самому низу pack-card */
+}
+
+.admin-button-group {
+    display: flex;
+    flex-direction: column; /* Кнопки будут располагаться вертикально */
+    gap: 10px; /* Отступ между кнопками */
+}
+
+.admin-btn-action {
+    /* Если у вас уже есть стили для .btn-full, они применятся.
+       Это для дополнительной специфичности, если нужно. */
+    width: 100%;
+    font-size: 0.9em; /* Чуть меньше шрифт, если нужно */
+    padding: 8px 12px; /* Чуть меньше паддинги */
+}
+
+/* Переопределение цвета для кнопки редактирования, если нужно */
+.admin-button-group .btn-secondary {
+    background-color: #6c757d; /* Например, серый */
+    color: white;
+}
+.admin-button-group .btn-secondary:hover {
+    background-color: #5a6268;
 }

@@ -8,14 +8,13 @@
             <div class="panel-title h5 mt-10">Редактировать Вопрос для "{{ quiz_pack.title }}"</div>
         </div>
         <div class="panel-body">
-            {# ИСПРАВЛЕНО: 'admin_edit_question' -> 'admin.edit_question' #}
             <form action="{{ url_for('admin.edit_question', question_id=question.id) }}" method="POST" class="form-horizontal">
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
                         <label class="form-label" for="question_text">Текст вопроса</label>
                     </div>
                     <div class="col-9 col-sm-12">
-                        <textarea class="form-input" id="question_text" name="question_text" required>{{ question.question_text }}</textarea>
+                        <textarea class="form-input" id="question_text" name="question_text" required>{{ question.question_text }} </textarea>
                     </div>
                 </div>
                 <div class="form-group">
@@ -28,36 +27,37 @@
                     </div>
                 </div>
                 <div class="divider text-center" data-content="Варианты Ответов"></div>
+                {# Изменены имена полей для вариантов ответа #}
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
-                        <label class="form-label" for="option_A">Вариант A</label>
+                        <label class="form-label" for="option_0">Вариант A</label>
                     </div>
                     <div class="col-9 col-sm-12">
-                        <input class="form-input" type="text" id="option_A" name="option_A" value="{{ current_options['A'] }}" required>
+                        <input class="form-input" type="text" id="option_0" name="option_0" value="{{ options[0] if options[0] is defined else '' }}" required>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
-                        <label class="form-label" for="option_B">Вариант B</label>
+                        <label class="form-label" for="option_1">Вариант B</label>
                     </div>
                     <div class="col-9 col-sm-12">
-                        <input class="form-input" type="text" id="option_B" name="option_B" value="{{ current_options['B'] }}" required>
+                        <input class="form-input" type="text" id="option_1" name="option_1" value="{{ options[1] if options[1] is defined else '' }}" required>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
-                        <label class="form-label" for="option_C">Вариант C</label>
+                        <label class="form-label" for="option_2">Вариант C</label>
                     </div>
                     <div class="col-9 col-sm-12">
-                        <input class="form-input" type="text" id="option_C" name="option_C" value="{{ current_options['C'] }}" required>
+                        <input class="form-input" type="text" id="option_2" name="option_2" value="{{ options[2] if options[2] is defined else '' }}" required>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
-                        <label class="form-label" for="option_D">Вариант D</label>
+                        <label class="form-label" for="option_3">Вариант D</label>
                     </div>
                     <div class="col-9 col-sm-12">
-                        <input class="form-input" type="text" id="option_D" name="option_D" value="{{ current_options['D'] }}" required>
+                        <input class="form-input" type="text" id="option_3" name="option_3" value="{{ options[3] if options[3] is defined else '' }}" required>
                     </div>
                 </div>
                 <div class="form-group">
@@ -65,7 +65,7 @@
                         <label class="form-label" for="correct_answer">Правильный ответ (A, B, C, D)</label>
                     </div>
                     <div class="col-9 col-sm-12">
-                        <input class="form-input" type="text" id="correct_answer" name="correct_answer" pattern="[ABCD]" title="Введите A, B, C или D" value="{{ question.correct_answer }}" required>
+                        <input class="form-input" type="text" id="correct_answer" name="correct_answer" pattern="[ABCDabcd]" title="Введите A, B, C или D" value="{{ question.correct_answer if question.correct_answer is defined else '' }}" required>
                     </div>
                 </div>
                 <div class="form-group">
@@ -76,8 +76,7 @@
             </form>
         </div>
         <div class="panel-footer text-center">
-            {# ИСПРАВЛЕНО: 'admin_add_question' -> 'admin.add_question' #}
-            <a href="{{ url_for('admin.add_question', quiz_id=quiz_pack.id) }}">Вернуться к вопросам квиз-пака</a>
+            <a href="{{ url_for('admin.add_question', quiz_id=quiz_pack.id) }}" class="btn btn-primary">Вернуться к вопросам квиз-пака</a>
         </div>
     </div>
 {% endblock %}

@@ -186,7 +186,7 @@
                         </div>
                     </div>
 
-                    {# НОВОЕ Достижение 5: Упорный ученик (Пройти 10 квизов) #}
+                    {# Достижение 5: Упорный ученик (Пройти 10 квизов) #}
                     {% set persistent_student_unlocked = total_quizzes_completed >= 10 %}
                     <div class="achievement {% if persistent_student_unlocked %}unlocked{% endif %} achievement-orange">
                         <i class="fas fa-book-reader achievement-icon {% if persistent_student_unlocked %}unlocked-icon{% endif %}"></i>
@@ -196,7 +196,7 @@
                         </div>
                     </div>
 
-                    {# НОВОЕ Достижение 6: Повелитель паков (Пройти 5 разных паков) #}
+                    {# Достижение 6: Повелитель паков (Пройти 5 разных паков) #}
                     {% set pack_master_unlocked = pack_stats|length >= 5 %}
                     <div class="achievement {% if pack_master_unlocked %}unlocked{% endif %} achievement-amber">
                         <i class="fas fa-globe-americas achievement-icon {% if pack_master_unlocked %}unlocked-icon{% endif %}"></i>
@@ -206,7 +206,7 @@
                         </div>
                     </div>
 
-                    {# НОВОЕ Достижение 7: Безошибочный (Пройти квиз со 100% точностью, мин. 5 вопросов) #}
+                    {# Достижение 7: Безошибочный (Пройти квиз со 100% точностью, мин. 5 вопросов) #}
                     {% set flawless_unlocked = has_flawless_quiz %}
                     <div class="achievement {% if flawless_unlocked %}unlocked{% endif %} achievement-red">
                         <i class="fas fa-check-double achievement-icon {% if flawless_unlocked %}unlocked-icon{% endif %}"></i>
@@ -216,7 +216,7 @@
                         </div>
                     </div>
 
-                    {# НОВОЕ Достижение 8: Скорострел (Среднее время ответа < 3с, 80%+ точность, мин. 5 вопросов) #}
+                    {# Достижение 8: Скорострел (Среднее время ответа < 3с, 80%+ точность, мин. 5 вопросов) #}
                     {% set sharpshooter_speed_unlocked = has_sharpshooter_speed_quiz %}
                     <div class="achievement {% if sharpshooter_speed_unlocked %}unlocked{% endif %} achievement-teal">
                         <i class="fas fa-bolt achievement-icon {% if sharpshooter_speed_unlocked %}unlocked-icon{% endif %}"></i>

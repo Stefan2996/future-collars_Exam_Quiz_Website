@@ -34,6 +34,7 @@ class QuizPack(db.Model):
     image_url = db.Column(db.String(200), nullable=True)
     color = db.Column(db.String(20), default='blue')
     difficulty = db.Column(db.String(20), default='Легкий')
+    time_to_complete_minutes = db.Column(db.Integer, default=10)
 
     questions = db.relationship('Question', backref='quiz_pack', lazy=True)
 
