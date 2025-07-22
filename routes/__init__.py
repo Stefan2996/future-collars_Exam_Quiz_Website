@@ -1,3 +1,3 @@
 # routes/__init__.py
-# Этот файл делает директорию 'routes' пакетом Python.
-# Он может быть пустым.
+# This file makes the 'routes' directory a Python package
+# It may be empty
