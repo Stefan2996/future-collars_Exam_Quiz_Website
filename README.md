@@ -1,70 +1,131 @@
 # QuizMaster - Quiz Game Website
 
-A web application for conducting interactive quizzes with a full-fledged registration system, statistics tracking, and unique achievements.
+A web application for conducting interactive quizzes with a full-fledged registration system, detailed statistics tracking, and unique achievements.
+
+-----
 
 ## Features
 
--   🎯 **Diverse Quizzes with Difficulty Levels** - A selection of topics (Programming, Movies, etc.), with each quiz pack categorized by difficulty levels: **Easy, Medium, Hard, Expert**.
--   👤 **User System** - A complete authentication system: new user registration, secure login, and personalized profiles.
--   📊 **Detailed Statistics** - Comprehensive tracking of each user's progress across completed quiz packs, including the number of correct answers and games finished.
--   🏆 **Achievement System** - Motivating rewards and badges for various in-game successes and milestones.
--   📱 **Responsive Design** - A fully adaptive interface ensuring comfortable use on any device, from desktops to mobile phones.
+  * 🎯 **Diverse Quiz Packs with Difficulty Levels**
+      * A wide selection of topics (e.g., Programming, Movies, History).
+      * Each quiz pack is categorized by its difficulty level: **Easy, Medium, Hard, Expert**.
+      * Includes an **estimated completion time** and **customizable colors** for visual distinction.
+  * 👤 **User System**
+      * A complete authentication system: registration, secure login, and personalized profiles.
+  * 📊 **Detailed Statistics**
+      * Comprehensive tracking of each user's progress, including the number of correct answers and total games finished.
+  * 🏆 **Achievement System**
+      * Motivating rewards and badges for various in-game successes.
+  * 📱 **Responsive Design**
+      * A fully adaptive interface for comfortable use on any device.
+
+-----
 
 ## Installation and Setup
 
 To run the application on your local machine, follow these steps:
 
-1.  Clone the repository (if you haven't already):
+1.  **Clone the repository**:
+
     ```bash
     git clone <YOUR_REPOSITORY_URL>
-    cd quiz-game
+    cd quizmaster
     ```
 
-2.  Install the necessary Python dependencies:
+2.  **Install the necessary Python dependencies**:
+
     ```bash
     pip install -r requirements.txt
     ```
 
-3.  Initialize the database (if this is the first run or you want to reset data):
-    ```bash
-    # You might need to run the command from the scripts/ folder or specify the full path
-    # python scripts/init_database.py
-    # Or via Alembic, if used for migrations: flask db upgrade
-    ```
-    *Note: Ensure your SQLite database is created and initialized according to your scripts.*
+3.  **Initialize the database and run migrations**:
 
-4.  Run the Flask application:
+      * Ensure Alembic is configured (if used).
+      * Run migrations to create tables and fields, including the new difficulty, time, and color fields for `QuizPack`:
+        ```bash
+        flask db migrate -m "Add difficulty, time, and color to QuizPack"
+        flask db upgrade
+        ```
+      * If you're using `init_database.py` to create initial data, ensure it's updated to populate these new fields.
+
+4.  **Run the Flask application**:
+
     ```bash
     python app.py
     ```
 
-5.  Open your web browser and navigate to:
-    [http://localhost:5000](http://localhost:5000)
+5.  **Open your web browser** and navigate to:
+    [http://localhost:5000](https://www.google.com/search?q=http://localhost:5000)
+
+-----
+
+## Admin Panel
+
+QuizMaster includes a powerful admin panel for convenient content management.
+
+### How to Access the Admin Panel:
+
+1.  Register a new user or log in with an existing account.
+2.  In the current implementation, **any registered user has access to the admin panel**. In a real-world project, a robust role-based access control system (e.g., checking `current_user.is_admin`) should be implemented here.
+3.  Navigate to the URL: [http://localhost:5000/admin](https://www.google.com/search?q=http://localhost:5000/admin)
+
+### Adding and Managing Packs:
+
+From the admin panel, you can:
+
+  * **Create new quiz packs**: Specify the title, description, **color**, **difficulty level**, and **estimated completion time**.
+  * **Edit existing quiz packs**: Modify their data.
+  * **Add, edit, and delete questions** for each quiz pack.
+  * **Delete entire quiz packs**, which also removes all associated questions and user statistics for that pack.
+
+-----
 
 ## Technologies
 
--   **Backend**: Python Flask, a powerful and flexible micro-framework for web development, using SQLAlchemy for database interaction.
--   **Frontend**: Modern web technologies - HTML5 for structure, CSS3 for styling, and JavaScript for interactivity.
--   **Database**: SQLite, a lightweight file-based database, ideal for small to medium applications, with a configured migration system (if Alembic is used).
--   **Styling**: Fully custom CSS utilizing gradients, animations, and other modern techniques to create a unique user interface.
--   **Icons**: Font Awesome for a wide range of vector icons.
--   **Templating**: Jinja2 - a powerful and secure templating engine for rendering HTML pages.
+  * **Backend**: **Python Flask** with **SQLAlchemy**.
+  * **Frontend**: **HTML5**, **CSS3**, and **JavaScript**.
+  * **Database**: **SQLite** with **Alembic** for migrations.
+  * **Styling**: Fully **custom CSS** with gradients and animations.
+  * **Icons**: **Font Awesome**.
+  * **Templating**: **Jinja2**.
+
+-----
 
 ## Functionality
 
 ### Application Pages:
--   **Home** - An appealing landing page introducing users to the application.
--   **Register/Login** - A secure (hashed) and convenient user authentication system.
--   **Quiz Packs** - Displays a list of all available quiz packs, each indicating its topic and difficulty level.
--   **Quiz** - An interactive mode for answering questions, showing progress and answer options.
--   **Profile** - A personalized user page with statistics, game history, and achievements.
--   **Admin Panel** - A specialized section for administrators to add, modify, and delete quiz packs and questions, as well as manage their difficulty levels.
 
-### Features:
--   **Automatic Result Saving** - User progress is saved automatically.
--   **Progress and Achievement System** - Tracking user success and rewarding completed tasks.
--   **Responsive Design for Mobile Devices** - Optimized display and interaction on smartphones and tablets.
--   **Flash Messages for Notifications** - Dynamic notifications for the user (success, error, information).
--   **Secure Password Storage (Hashing)** - User passwords are stored in hashed form for maximum security.
--   **Reliable Display of Question and Answer Content** - Built-in handling and escaping of special HTML characters (`&lt;`, `&gt;`, etc.) for correct rendering of code, HTML tags, and other symbols in questions and answer options.
--   **Convenient Content Management** - The Admin Panel allows easy updating of quiz pack data, including their difficulty levels, ensuring accuracy and correct display.
+  * **Home** - An appealing landing page.
+  * **Register/Login** - A secure authentication system.
+  * **Quiz Packs** - A list of all available packs with information on **difficulty, color, and time**.
+  * **Quiz** - Interactive mode for answering questions.
+  * **Profile** - A personalized user page with statistics and achievements.
+  * **Admin Panel** - A section for managing quiz packs and questions, including their **difficulty, time, and color**.
+
+### Additional Features:
+
+  * **Automatic Result Saving**.
+  * **Progress and Achievement System**.
+  * **Responsive Design for Mobile Devices**.
+  * **Flash Messages for Notifications**.
+  * **Secure Password Storage (Hashing)**.
+  * **Reliable Display of Question and Answer Content**.
+  * **Convenient Content Management** via the Admin Panel.
+
+-----
+
+## Future Plans
+
+We plan to expand QuizMaster's functionality by adding the following features:
+
+  * **Enhanced Pack Management**: Ability to reorder quiz packs.
+  * **User Personalization**: Adding user avatar upload functionality.
+  * **Improved Statistics**: Collecting aggregated statistics across thematic groups of packs.
+  * **Increased Gameplay Complexity**:
+      * Implementing a "lives" system (e.g., 3 lives).
+      * Expanding difficulty level mechanics with experience point accumulation for completion.
+      * Setting a "passing score" (e.g., 80%) for successful quiz completion.
+  * **New Game Modes**: Creating a "Random Quiz" mode.
+  * **Continuous Improvement**: Regular bug fixing and overall website polishing.
+
+-----
