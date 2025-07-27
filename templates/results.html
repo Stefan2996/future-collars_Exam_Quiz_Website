@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}Результаты: {{ pack.title }} - QuizMaster{% endblock %}
+{% block title %}Results: {{ pack.title }} - QuizMaster{% endblock %}
 
 {% block header %}
 <header class="header header-compact-padding">
     <div class="container">
         <div class="header-content">
-            <a href="{{ url_for('packs.packs') }}" class="back-link"> {# Изменено на packs.packs #}
+            <a href="{{ url_for('packs.packs') }}" class="back-link">
                 <i class="fas fa-arrow-left"></i>
-                Назад к пакам
+                Back to Packs
             </a>
             <div class="quiz-title">
                 <i class="fas fa-chart-bar"></i>
-                <span>Результаты квиза</span>
+                <span>Quiz Results</span>
             </div>
         </div>
     </div>
@@ -40,13 +40,13 @@
                     </div>
                     <div class="percentage-score">
                         {% if quiz_stat.total_questions > 0 %}
-                            {{ ((quiz_stat.score / quiz_stat.total_questions) * 100) | round | int }}% правильных ответов
+                            {{ ((quiz_stat.score / quiz_stat.total_questions) * 100) | round | int }}% correct answers
                         {% else %}
-                            0% правильных ответов
+                            0% correct answers
                         {% endif %}
                     </div>
                     <div class="completion-date">
-                        Завершено: {{ quiz_stat.completed_at.strftime('%d.%m.%Y в %H:%M') }}
+                        Completed: {{ quiz_stat.completed_at.strftime('%d.%m.%Y at %H:%M') }}
                     </div>
                 </div>
 
@@ -55,22 +55,22 @@
                     {% if percentage >= 90 %}
                         <div class="badge excellent">
                             <i class="fas fa-star"></i>
-                            <span>Отличный результат!</span>
+                            <span>Excellent Result!</span>
                         </div>
                     {% elif percentage >= 70 %}
                         <div class="badge good">
                             <i class="fas fa-thumbs-up"></i>
-                            <span>Хороший результат!</span>
+                            <span>Good Result!</span>
                         </div>
                     {% elif percentage >= 50 %}
                         <div class="badge average">
                             <i class="fas fa-check"></i>
-                            <span>Неплохо!</span>
+                            <span>Not Bad!</span>
                         </div>
                     {% else %}
                         <div class="badge needs-improvement">
                             <i class="fas fa-redo"></i>
-                            <span>Можно лучше!</span>
+                            <span>Can Do Better!</span>
                         </div>
                     {% endif %}
                 </div>
@@ -79,20 +79,20 @@
             <div class="pack-statistics-card">
                 <h3>
                     <i class="fas fa-chart-line"></i>
-                    Ваша статистика по этому паку
+                    Your Statistics for This Pack
                 </h3>
                 <div class="stats-grid">
                     <div class="stat-item">
                         <div class="stat-value">{{ pack_stats.total_attempts }}</div>
-                        <div class="stat-label">Попыток</div>
+                        <div class="stat-label">Attempts</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value">{{ pack_stats.best_score }}/{{ pack_stats.total_questions_in_pack }}</div>
-                        <div class="stat-label">Лучший результат</div>
+                        <div class="stat-label">Best Score</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value">{{ pack_stats.average_score | round(1) }}</div>
-                        <div class="stat-label">Средний балл</div>
+                        <div class="stat-label">Average Score</div>
                     </div>
                     <div class="stat-item">
                         {% if pack_stats.total_questions_in_pack > 0 %}
@@ -100,7 +100,7 @@
                         {% else %}
                             <div class="stat-value">0%</div>
                         {% endif %}
-                        <div class="stat-label">Лучшая точность</div>
+                        <div class="stat-label">Best Accuracy</div>
                     </div>
                 </div>
             </div>
@@ -109,10 +109,10 @@
                 <div class="card-header">
                     <h3>
                         <i class="fas fa-list-check"></i>
-                        Подробные результаты
+                        Detailed Results
                     </h3>
                     <button class="toggle-details-btn" onclick="toggleDetails()">
-                        <span id="toggle-text">Показать детали</span>
+                        <span id="toggle-text">Show Details</span>
                         <i class="fas fa-chevron-down" id="toggle-icon"></i>
                     </button>
                 </div>
@@ -120,11 +120,11 @@
                 <div class="questions-summary">
                     <div class="summary-item correct">
                         <i class="fas fa-check-circle"></i>
-                        <span>{{ quiz_stat.score }} правильных</span>
+                        <span>{{ quiz_stat.score }} correct</span>
                     </div>
                     <div class="summary-item incorrect">
                         <i class="fas fa-times-circle"></i>
-                        <span>{{ quiz_stat.total_questions - quiz_stat.score }} неправильных</span>
+                        <span>{{ quiz_stat.total_questions - quiz_stat.score }} incorrect</span>
                     </div>
                 </div>
 
@@ -133,7 +133,7 @@
                     <div class="question-result {% if result.is_correct %}correct{% else %}incorrect{% endif %}">
                         <div class="question-header">
                             <div class="question-number">
-                                Вопрос {{ loop.index }}
+                                Question {{ loop.index }}
                                 {% if result.is_correct %}
                                     <i class="fas fa-check-circle correct-icon"></i>
                                 {% else %}
@@ -169,30 +169,30 @@
             </div>
 
             <div class="action-buttons">
-                <a href="{{ url_for('quiz.quiz', pack_id=pack.id) }}" class="btn btn-primary"> {# Изменено на quiz.quiz #}
+                <a href="{{ url_for('quiz.quiz', pack_id=pack.id) }}" class="btn btn-primary">
                     <i class="fas fa-redo"></i>
-                    Пройти снова
+                    Retake Quiz
                 </a>
-                <a href="{{ url_for('packs.packs') }}" class="btn btn-outline"> {# Изменено на packs.packs #}
+                <a href="{{ url_for('packs.packs') }}" class="btn btn-outline">
                     <i class="fas fa-th-large"></i>
-                    Другие паки
+                    Other Packs
                 </a>
-                <a href="{{ url_for('auth.profile') }}" class="btn btn-secondary"> {# Изменено на auth.profile #}
+                <a href="{{ url_for('auth.profile') }}" class="btn btn-secondary">
                     <i class="fas fa-user"></i>
-                    Мой профиль
+                    My Profile
                 </a>
             </div>
 
             <div class="share-section">
-                <h4>Поделиться результатом</h4>
+                <h4>Share Result</h4>
                 <div class="share-buttons">
                     <button class="share-btn" onclick="shareResult()">
                         <i class="fas fa-share"></i>
-                        Поделиться
+                        Share
                     </button>
                     <button class="share-btn" onclick="copyResult()">
                         <i class="fas fa-copy"></i>
-                        Копировать
+                        Copy
                     </button>
                 </div>
             </div>
@@ -200,62 +200,11 @@
     </div>
 </div>
 
-{# ПЕРЕМЕЩЕНО: Скрипты и стили должны быть внутри блока content (или других блоков, определенных в base.html) #}
-<script>
-function toggleDetails() {
-    const details = document.getElementById('questions-details');
-    const toggleText = document.getElementById('toggle-text');
-    const toggleIcon = document.getElementById('toggle-icon');
-
-    if (details.style.display === 'none' || details.style.display === '') {
-        details.style.display = 'block';
-        toggleText.textContent = 'Скрыть детали';
-        toggleIcon.className = 'fas fa-chevron-up';
-    } else {
-        details.style.display = 'none';
-        toggleText.textContent = 'Показать детали';
-        toggleIcon.className = 'fas fa-chevron-down';
-    }
-}
-
-function shareResult() {
-    const score = {{ quiz_stat.score }};
-    const total = {{ quiz_stat.total_questions }};
-    const percentage = {{ ((quiz_stat.score / quiz_stat.total_questions) * 100) | round | int }};
-    const packTitle = "{{ pack.title }}";
-
-    const text = `Я прошел квиз "${packTitle}" и набрал ${score}/${total} баллов (${percentage}%)! 🎯`;
-
-    if (navigator.share) {
-        navigator.share({
-            title: 'Мой результат в QuizMaster',
-            text: text,
-            url: window.location.href
-        });
-    } else {
-        copyResult();
-        alert('Результат скопирован в буфер обмена!');
-    }
-}
-
-function copyResult() {
-    const score = {{ quiz_stat.score }};
-    const total = {{ quiz_stat.total_questions }};
-    const percentage = {{ ((quiz_stat.score / quiz_stat.total_questions) * 100) | round | int }};
-    const packTitle = "{{ pack.title }}";
-
-    const text = `Я прошел квиз "${packTitle}" и набрал ${score}/${total} баллов (${percentage}%)! 🎯\n\nПопробуй и ты: ${window.location.origin}`;
-
-    navigator.clipboard.writeText(text).then(() => {
-        const notification = document.createElement('div');
-        notification.className = 'copy-notification';
-        notification.textContent = 'Результат скопирован!';
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
-    });
-}
+{# Added hidden JSON tag to pass data to JavaScript #}
+<script id="results-data" type="application/json">
+    {{ results_data_json | safe }}
 </script>
+
+{# Include external JavaScript file #}
+<script src="{{ url_for('static', filename='js/results.js') }}"></script>
 {% endblock %}

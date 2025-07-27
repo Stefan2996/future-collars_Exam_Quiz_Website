@@ -9,12 +9,11 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-    /* Убрал дублирование font-family */
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     line-height: 1.6;
     color: #333;
-    display: flex; /* Делаем body flex-контейнером */
-    flex-direction: column; /* Элементы body располагаем по вертикали */
+    display: flex; /* Makes body a flex container */
+    flex-direction: column; /* Arranges body elements vertically */
 }
 
 .container {
@@ -241,7 +240,7 @@ html, body {
 }
 
 .hero-content {
-  max-width: 4xl; /* Возможно, здесь имелся в виду класс TailwindCSS */
+  max-width: 4xl;
   margin: 0 auto;
 }
 
@@ -263,7 +262,7 @@ html, body {
   font-size: 1.25rem;
   color: #6b7280;
   margin-bottom: 2rem;
-  max-width: 32rem; /* Возможно, здесь также класс TailwindCSS */
+  max-width: 32rem;
   margin-left: auto;
   margin-right: auto;
 }
@@ -616,24 +615,25 @@ html, body {
   font-weight: 500;
 }
 
-.difficulty-Легкий {
+/* Difficulty classes */
+.difficulty-Easy {
   background: #d1fae5;
   color: #065f46;
 }
 
-.difficulty-Средний {
+.difficulty-Medium {
   background: #fef3c7;
   color: #92400e;
 }
 
-.difficulty-Сложный {
+.difficulty-Hard {
   background: #fee2e2;
   color: #991b1b;
 }
 
-.difficulty-Эксперт {
+.difficulty-Expert {
     color: #fff;
-    background-color: #212121; /* Черный */
+    background-color: #212121; /* Black */
 }
 
 .pack-card h3 {
@@ -718,6 +718,17 @@ html, body {
   padding: 2rem 0;
 }
 
+.quiz-card img {
+    max-width: 100%;      /* Изображение не будет шире своего родителя */
+    height: auto;         /* Сохраняет пропорции изображения */
+    display: block;       /* Убеждаемся, что margin-bottom применяется корректно */
+    margin-bottom: 1.5rem; /* Отступ снизу от изображения */
+    margin-left: auto;    /* Центрирование изображения по горизонтали */
+    margin-right: auto;   /* Центрирование изображения по горизонтали */
+    object-fit: contain;  /* Гарантирует, что изображение полностью видно в контейнере */
+    flex-shrink: 0;       /* Предотвращает сжатие изображения, если родитель - flex-контейнер */
+}
+
 .quiz-progress {
   margin-bottom: 2rem;
 }
@@ -744,7 +755,7 @@ html, body {
   transition: width 0.3s ease;
 }
 
-.quiz-card { /* Объединил с results-card, т.к. были идентичны */
+.quiz-card { /* Combined with results-card, as they were identical */
   background: white;
   border-radius: 1rem;
   padding: 2rem;
@@ -825,8 +836,8 @@ html, body {
     min-height: calc(100vh - var(--header-height, 0px));
     background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
     display: flex;
-    justify-content: center; /* Это свойство центрирует содержимое по горизонтали */
-    align-items: center;   /* Измените с flex-start на center для вертикального центрирования */
+    justify-content: center; /* This property centers content horizontally */
+    align-items: center;   /* Change from flex-start to center for vertical centering */
 }
 
 .results-container {
@@ -856,7 +867,7 @@ html, body {
 
 .results-icon {
     font-size: 3.5em;
-    color: #007bff; /* Цвет из results.html */
+    color: #007bff; /* Color from results.html */
     margin-bottom: 10px;
 }
 
@@ -869,12 +880,12 @@ html, body {
 .pack-description {
     color: #707b8b;
     font-size: 1em;
-    /* Можно задать min-height или max-height, чтобы выровнять высоту для текста */
-    min-height: 60px; /* Пример: 3 строки текста по 20px */
-    /* Или max-height с overflow: hidden для обрезки длинных описаний */
+    /* Can set min-height or max-height to align text height */
+    min-height: 60px; /* Example: 3 lines of text at 20px */
+    /* Or max-height with overflow: hidden to truncate long descriptions */
     /* max-height: 80px;
     overflow: hidden; */
-    margin-bottom: 10px; /* Отступ от мета-информации */
+    margin-bottom: 10px; /* Spacing from meta-information */
 }
 
 .pack-details-grid {
@@ -899,7 +910,7 @@ html, body {
 .score-number {
     font-size: 4.5em;
     font-weight: bold;
-    color: #28a745; /* Цвет из results.html */
+    color: #28a745; /* Color from results.html */
 }
 
 .score-divider {
@@ -916,7 +927,7 @@ html, body {
 .percentage-score {
     font-size: 1.8em;
     font-weight: bold;
-    color: #007bff; /* Цвет из results.html */
+    color: #007bff; /* Color from results.html */
     margin-bottom: 10px;
 }
 
@@ -984,28 +995,28 @@ html, body {
 
 /* .stats-grid already defined for profile page, check for conflicts if needed */
 /* The one below is specific to the "pack-statistics-card" section, which is good. */
-.pack-statistics-card .stats-grid { /* Уточнил селектор, чтобы избежать конфликтов */
+.pack-statistics-card .stats-grid { /* Clarified selector to avoid conflicts */
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 15px;
     text-align: center;
 }
 
-.pack-statistics-card .stat-item { /* Уточнил селектор */
+.pack-statistics-card .stat-item { /* Clarified selector */
     background-color: #e9f0f7;
     padding: 15px;
     border-radius: 8px;
     border: 1px solid #d0dbe7;
 }
 
-.pack-statistics-card .stat-value { /* Уточнил селектор */
+.pack-statistics-card .stat-value { /* Clarified selector */
     font-size: 1.6em;
     font-weight: bold;
     color: #334e68;
     margin-bottom: 5px;
 }
 
-.pack-statistics-card .stat-label { /* Уточнил селектор */
+.pack-statistics-card .stat-label { /* Clarified selector */
     font-size: 0.85em;
     color: #556c84;
 }
@@ -1207,36 +1218,36 @@ html, body {
 }
 
 /* Using existing .btn-primary, .btn-outline, .btn-secondary */
-.action-buttons .btn-primary { /* Это уже есть выше */
+.action-buttons .btn-primary { /* This already exists above */
     /* background-color: #007bff; */
     /* color: white; */
     /* border: 1px solid #007bff; */
 }
 
-.action-buttons .btn-primary:hover { /* Это уже есть выше */
+.action-buttons .btn-primary:hover { /* This already exists above */
     /* background-color: #0056b3; */
     /* border-color: #0056b3; */
     /* transform: translateY(-2px); */
 }
 
-.action-buttons .btn-outline { /* Это уже есть выше */
+.action-buttons .btn-outline { /* This already exists above */
     /* background-color: transparent; */
     /* color: #007bff; */
     /* border: 1px solid #007bff; */
 }
 
-.action-buttons .btn-outline:hover { /* Это уже есть выше */
+.action-buttons .btn-outline:hover { /* This already exists above */
     /* background-color: #e0f2ff; */
     /* transform: translateY(-2px); */
 }
 
-.action-buttons .btn-secondary { /* Это уже есть выше */
+.action-buttons .btn-secondary { /* This already exists above */
     /* background-color: #6c757d; */
     /* color: white; */
     /* border: 1px solid #6c757d; */
 }
 
-.action-buttons .btn-secondary:hover { /* Это уже есть выше */
+.action-buttons .btn-secondary:hover { /* This already exists above */
     /* background-color: #5a6268; */
     /* border-color: #5a6268; */
     /* transform: translateY(-2px); */
@@ -1298,10 +1309,10 @@ html, body {
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     padding: 30px;
-    margin-bottom: 30px; /* Отступ между карточками */
+    margin-bottom: 30px; /* Spacing between cards */
 }
 
-.profile-card .user-info { /* Уточнил селектор для user-info на странице профиля */
+.profile-card .user-info { /* Clarified selector for user-info on profile page */
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -1333,7 +1344,7 @@ html, body {
   gap: 0.25rem;
 }
 
-.stats-grid { /* Общий стиль для сетки статистики (профиль, паки) */
+.stats-grid { /* General style for statistics grid (profile, packs) */
   display: grid;
   gap: 1.5rem;
   grid-template-columns: 1fr;
@@ -1446,7 +1457,7 @@ html, body {
 }
 
 .card-content {
-    /* Дополнительные стили, если нужны */
+    /* Additional styles, if needed */
 }
 
 .detail-label {
@@ -1460,7 +1471,7 @@ html, body {
     color: #333;
 }
 
-/* Стили для прогресс-бара */
+/* Styles for the progress bar */
 .progress-bar-container {
     width: 100%;
     height: 8px; /* h-2 */
@@ -1472,12 +1483,12 @@ html, body {
 
 .progress-bar-fill {
     height: 100%;
-    background-color: #4299e1; /* Пример синего цвета, можете изменить */
+    background-color: #4299e1; /* Example blue color, you can change */
     border-radius: 9999px; /* rounded-full */
     transition: width 0.3s ease-in-out;
 }
 
-/* Стили для списка паков */
+/* Styles for pack list */
 .space-y-4 > *:not(:last-child) {
     margin-bottom: 1rem; /* space-y-4 */
 }
@@ -1504,7 +1515,7 @@ html, body {
     font-weight: 600; /* font-semibold */
     font-size: 1.125rem; /* text-lg */
     color: #333;
-    margin: 0; /* Убираем стандартные отступы у h3 */
+    margin: 0; /* Remove default h3 margins */
 }
 
 .attempts-badge {
@@ -1572,7 +1583,7 @@ html, body {
     width: 3rem; /* w-12 */
     color: #9ca3af; /* text-gray-400 */
     margin-bottom: 1rem; /* mb-4 */
-    display: block; /* Для центрирования margin: auto */
+    display: block; /* For centering margin: auto */
 }
 
 .achievements-grid {
@@ -1594,15 +1605,15 @@ html, body {
     display: flex; /* flex */
     align-items: center; /* items-center */
     gap: 0.75rem; /* space-x-3 */
-    background-color: #f9fafb; /* bg-gray-50 - базовый фон для заблокированных */
-    border-color: #e5e7eb; /* border-gray-200 - базовая граница для заблокированных */
+    background-color: #f9fafb; /* bg-gray-50 - base background for locked */
+    border-color: #e5e7eb; /* border-gray-200 - base border for locked */
     transition: all 0.2s ease-in-out;
 }
 
 .achievement-icon {
     height: 1.5rem; /* h-6 */
     width: 1.5rem; /* w-6 */
-    color: #9ca3af; /* text-gray-400 - базовый цвет иконки для заблокированных */
+    color: #9ca3af; /* text-gray-400 - base icon color for locked */
 }
 
 .achievement-info h4 {
@@ -1623,16 +1634,16 @@ html, body {
 .achievement.unlocked {
   border-color: #fbbf24;
   background: #fffbeb;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Легкая тень для разблокированных */
-  transform: translateY(-2px); /* Небольшой подъем при разблокировке */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Light shadow for unlocked */
+  transform: translateY(-2px); /* Slight lift on unlock */
 }
 
 .achievement.unlocked .achievement-info h4 {
-    color: #1a202c; /* Более темный текст для заголовка разблокированного достижения */
+    color: #1a202c; /* Darker text for unlocked achievement title */
 }
 
 .achievement.unlocked .achievement-info p {
-    color: #4a5568; /* Более темный текст для описания разблокированного достижения */
+    color: #4a5568; /* Darker text for unlocked achievement description */
 }
 
 .achievement i {
@@ -1693,13 +1704,13 @@ html, body {
 
 /* Amber - Pack Master */
 .achievement-amber.unlocked {
-    border-color: #fcd34d; /* border-amber-300 - повторно используем как у yellow, но можно чуть изменить */
-    background-color: #fffbeb; /* bg-amber-50 - повторно используем как у yellow */
+    border-color: #fcd34d; /* border-amber-300 - re-using yellow, but can modify slightly */
+    background-color: #fffbeb; /* bg-amber-50 - re-using yellow */
 }
 .achievement-amber .achievement-icon.unlocked-icon {
-    color: #f59e0b; /* text-amber-500 - повторно используем как у yellow */
-    /* Если хотите другой оттенок, можно подобрать */
-    /* color: #d97706; например, чуть темнее */
+    color: #f59e0b; /* text-amber-500 - re-using yellow */
+    /* If you want a different shade, you can choose */
+    /* color: #d97706; for example, slightly darker */
 }
 
 /* Red - Flawless */
@@ -1735,12 +1746,12 @@ html, body {
     text-align: center;
 }
 .achievements-card .empty-state .icon-large {
-    font-size: 3rem; /* Для фа-медали */
+    font-size: 3rem; /* For Font Awesome medal */
 }
 
-/* Уточнение для achievements-card, чтобы она использовала стили profile-card */
+/* Clarification for achievements-card to use profile-card styles */
 .achievements-card {
-    /* Удалены дублирующиеся стили, так как теперь используется .profile-card */
+    /* Removed duplicate styles, as .profile-card is now used */
     /* background: white; */
     /* border-radius: 1rem; */
     /* padding: 1.5rem; */
@@ -1770,7 +1781,7 @@ html, body {
     flex-direction: column;
   }
 
-  /* Исправил конфликт: уточнен селектор для user-info в профиле, если он там меняет flex-direction */
+  /* Fixed conflict: clarified selector for user-info in profile, if it changes flex-direction there */
   .profile-card .user-info {
     flex-direction: column;
     text-align: center;
@@ -1780,14 +1791,14 @@ html, body {
 /* LOGIN PAGE */
 
 .form-group-checkbox {
-    display: flex;         /* Включаем Flexbox для выстраивания элементов в ряд */
-    align-items: center;   /* Выравниваем элементы по центру по вертикали */
-    gap: 8px;              /* Добавляем небольшой отступ между чекбоксом и текстом */
-    margin-top: 15px;      /* Отступ сверху, чтобы отделить от предыдущих полей */
-    margin-bottom: 15px;   /* Отступ снизу, если нужно */
+    display: flex;         /* Enables Flexbox for arranging elements in a row */
+    align-items: center;   /* Vertically aligns elements to the center */
+    gap: 8px;              /* Adds a small gap between the checkbox and text */
+    margin-top: 15px;      /* Top margin to separate from previous fields */
+    margin-bottom: 15px;   /* Bottom margin, if needed */
 }
 
-/* Сброс стандартных отступов для самого чекбокса и его метки */
+/* Reset default margins for the checkbox itself and its label */
 .form-group-checkbox input[type="checkbox"] {
     margin: 0;
     padding: 0;
@@ -1798,14 +1809,14 @@ html, body {
 .form-group-checkbox label {
     margin: 0;
     padding: 0;
-    cursor: pointer; /* Делает текст кликабельным, что улучшает UX */
+    cursor: pointer; /* Makes text clickable, which improves UX */
 }
 
 /* ADMIN PANEL */
 
 .admin-dashboard-container {
-    /* Уже центрируется благодаря .container в base.html,
-       но можно добавить еще немного верхнего/нижнего отступа, если .main-content недостаточно */
+    /* Already centered by .container in base.html,
+       but can add some top/bottom padding if .main-content is not enough */
     padding-top: 20px;
     padding-bottom: 20px;
 }
@@ -1813,13 +1824,13 @@ html, body {
 .panel {
     background-color: #ffffff;
     border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Мягкая тень */
-    padding: 0; /* Сброс внутренних отступов, если они были */
-    margin-bottom: 30px; /* Отступ снизу, если за панелью есть еще контент */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Soft shadow */
+    padding: 0; /* Reset inner padding, if any */
+    margin-bottom: 30px; /* Bottom margin, if there's more content after the panel */
 }
 
 .panel-header {
-    background-color: #f0f4f7; /* Легкий фон для заголовка панели */
+    background-color: #f0f4f7; /* Light background for panel header */
     padding: 20px 25px;
     border-bottom: 1px solid #e0e0e0;
     border-top-left-radius: 8px;
@@ -1827,24 +1838,24 @@ html, body {
 }
 
 .panel-title {
-    color: #34495e; /* Темный цвет текста для заголовка */
-    font-size: 1.8em; /* Немного крупнее */
-    margin: 0; /* Убираем стандартные отступы заголовка */
+    color: #34495e; /* Dark text color for header */
+    font-size: 1.8em; /* Slightly larger */
+    margin: 0; /* Remove default header margins */
 }
 
 .panel-body {
-    padding: 25px; /* Добавим хороший отступ внутри тела панели */
+    padding: 25px; /* Add good padding inside panel body */
 }
 
 .panel-footer {
     margin-bottom: 90px;
 }
 
-/* Пример базовых стилей для сетки и карточек */
+/* Example base styles for grid and cards */
 .quiz-packs-grid {
-    display: grid; /* Или display: flex; flex-wrap: wrap; */
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 300px - минимальная ширина карточки */
-    gap: 20px; /* Отступ между карточками */
+    display: grid; /* Or display: flex; flex-wrap: wrap; */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 300px - minimum card width */
+    gap: 20px; /* Spacing between cards */
     margin-top: 30px;
 }
 
@@ -1855,8 +1866,8 @@ html, body {
     background-color: #fff;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Чтобы футер был внизу */
-    height: 100%; /* Чтобы все карточки были одинаковой высоты в сетке */
+    justify-content: space-between; /* To keep footer at the bottom */
+    height: 100%; /* To make all cards the same height in the grid */
 }
 
 .quiz-pack-card .card-header,
@@ -1877,69 +1888,69 @@ html, body {
     font-size: 0.9em;
 }
 
-/* --- Стили для футера карточки с кнопками --- */
+/* --- Styles for card footer with buttons --- */
 
 .quiz-pack-card .custom-card-footer {
-    padding: 15px 20px; /* Внутренние отступы футера */
+    padding: 15px 20px; /* Inner footer padding */
     border-top: 1px solid #e0e0e0;
     background-color: #f9fbfb;
-    display: flex; /* Делаем футер Flex-контейнером */
-    flex-direction: column; /* Элементы внутри футера выстраиваются в колонку */
-    align-items: stretch; /* Дочерние элементы растягиваются на всю ширину футера */
-    gap: 10px; /* Отступ между группами кнопок (верхняя и нижняя) */
+    display: flex; /* Make footer a Flex container */
+    flex-direction: column; /* Elements inside footer arrange in a column */
+    align-items: stretch; /* Child elements stretch to full width of footer */
+    gap: 10px; /* Spacing between button groups (top and bottom) */
 }
 
 
-/* Группа для кнопки "Добавить вопрос" */
+/* Group for "Add Question" button */
 .quiz-pack-card .custom-card-footer .button-group-action {
-    width: 100%; /* Группа занимает всю ширину футера */
-    display: flex; /* Делаем эту группу Flex-контейнером */
-    justify-content: center; /* Центрируем кнопку внутри этой группы */
-    align-items: center; /* Выравнивание по вертикали (на всякий случай) */
+    width: 100%; /* Group takes full width of footer */
+    display: flex; /* Make this group a Flex container */
+    justify-content: center; /* Center button within this group */
+    align-items: center; /* Vertical alignment (just in case) */
 }
 
-/* Стили для кнопки "Добавить вопрос" */
+/* Styles for "Add Question" button */
 .quiz-pack-card .custom-card-footer .custom-btn-full {
-    display: block; /* Делаем кнопку блочным элементом */
-    width: 100%; /* Кнопка занимает всю ширину своей группы */
-    margin: 0 !important; /* Обнуляем все внешние отступы */
-    text-align: center; /* Центрируем текст внутри кнопки */
+    display: block; /* Make button a block element */
+    width: 100%; /* Button takes full width of its group */
+    margin: 0 !important; /* Reset all external margins */
+    text-align: center; /* Center text within button */
 }
 
-/* Группа для кнопок "Редактировать" и "Удалить" */
+/* Group for "Edit" and "Delete" buttons */
 .quiz-pack-card .custom-card-footer .button-group-controls {
-    width: 100%; /* Группа занимает всю ширину футера */
-    display: flex; /* Делаем эту группу Flex-контейнером */
-    justify-content: flex-end; /* Выравниваем кнопки внутри группы по правому краю */
-    gap: 10px; /* Отступ между кнопками "Редактировать" и "Удалить" */
-    align-items: center; /* Выравнивание по вертикали (на всякий случай) */
+    width: 100%; /* Group takes full width of footer */
+    display: flex; /* Make this group a Flex container */
+    justify-content: flex-end; /* Align buttons within group to the right */
+    gap: 10px; /* Spacing between "Edit" and "Delete" buttons */
+    align-items: center; /* Vertical alignment (just in case) */
 }
 
-/* Стили для кнопок "Редактировать" и "Удалить" */
+/* Styles for "Edit" and "Delete" buttons */
 .quiz-pack-card .custom-card-footer .custom-btn-small {
-    margin: 0 !important; /* Обнуляем все внешние отступы */
-    flex-shrink: 0; /* Не сжимать кнопку */
-    /* width: auto; /* Ширина по содержимому */
+    margin: 0 !important; /* Reset all external margins */
+    flex-shrink: 0; /* Do not shrink button */
+    /* width: auto; /* Width by content */
 }
 
-/* Стили для формы кнопки "Удалить" */
+/* Styles for "Delete" button form */
 .quiz-pack-card .custom-card-footer .custom-delete-form {
-    display: flex; /* Делаем форму Flex-контейнером */
-    margin: 0 !important; /* Обнуляем все внешние отступы формы */
+    display: flex; /* Make form a Flex container */
+    margin: 0 !important; /* Reset all external form margins */
 }
 
-/* Если Spectre.css или другие фреймворки дают отступы к элементам i,
-   можно убрать их, чтобы иконка была ближе к тексту */
+/* If Spectre.css or other frameworks add margins to i elements,
+   you can remove them to make the icon closer to the text */
 .quiz-pack-card .custom-card-footer .btn i.fas {
-    margin-right: 5px; /* Немного уменьшим отступ, если mr-1 слишком большой */
+    margin-right: 5px; /* Slightly reduce margin if mr-1 is too large */
 }
 
-/* Стили для кнопок внутри карточки (уже должны быть, но можно уточнить) */
+/* Styles for buttons inside card (should already exist, but can be clarified) */
 .quiz-pack-card .btn {
     padding: 6px 12px;
     font-size: 0.85em;
     border-radius: 5px;
-    white-space: nowrap; /* Чтобы кнопки не переносились на новую строку */
+    white-space: nowrap; /* Prevent buttons from wrapping to a new line */
 }
 .quiz-pack-card .btn-primary {
     background-color: #3498db;
@@ -1967,7 +1978,7 @@ html, body {
     border-color: #c0392b;
 }
 
-/* Стиль для сообщения об отсутствии квиз-паков */
+/* Style for message when no quiz packs are available */
 .empty-state {
     padding: 40px;
     border: 1px dashed #ccc;
@@ -1977,18 +1988,18 @@ html, body {
     font-size: 1.1em;
 }
 
-/* Утилитарные классы (если они не определены) */
+/* Utility classes (if not defined) */
 .text-center { text-align: center; }
 .mb-4 { margin-bottom: 1.5rem; } /* ~24px */
 .mt-10 { margin-top: 10px; }
 .mr-1 { margin-right: 0.25rem; } /* ~4px */
 
-/* Стили для иконок FontAwesome */
+/* FontAwesome icon styles */
 .fas {
-    margin-right: 5px; /* Небольшой отступ справа от иконки */
+    margin-right: 5px; /* Small right margin for icon */
 }
 
-/* Дополнительные стили для форм (если используются Spectre.css, у них уже есть) */
+/* Additional form styles (if Spectre.css is used, they already have them) */
 .form-group {
     margin-bottom: 15px;
 }
@@ -2001,7 +2012,7 @@ html, body {
     padding: 8px 12px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    box-sizing: border-box; /* Важно, чтобы padding не увеличивал ширину */
+    box-sizing: border-box; /* Important for padding not to increase width */
 }
 .form-input:focus, .form-textarea:focus {
     border-color: #3284e7;
@@ -2009,30 +2020,30 @@ html, body {
     box-shadow: 0 0 0 2px rgba(50, 132, 231, 0.2);
 }
 
-/* --- Стили для админ-футера карточки --- */
+/* --- Styles for admin card footer --- */
 
 .admin-pack-footer {
-    padding: 0 20px 20px; /* Сохраняем отступы как в pack-footer */
-    margin-top: auto; /* Прижимает футер к самому низу pack-card */
+    padding: 0 20px 20px; /* Retain padding as in pack-footer */
+    margin-top: auto; /* Pushes footer to the very bottom of pack-card */
 }
 
 .admin-button-group {
     display: flex;
-    flex-direction: column; /* Кнопки будут располагаться вертикально */
-    gap: 10px; /* Отступ между кнопками */
+    flex-direction: column; /* Buttons will be arranged vertically */
+    gap: 10px; /* Spacing between buttons */
 }
 
 .admin-btn-action {
-    /* Если у вас уже есть стили для .btn-full, они применятся.
-       Это для дополнительной специфичности, если нужно. */
+    /* If you already have styles for .btn-full, they will apply.
+       This is for additional specificity, if needed. */
     width: 100%;
-    font-size: 0.9em; /* Чуть меньше шрифт, если нужно */
-    padding: 8px 12px; /* Чуть меньше паддинги */
+    font-size: 0.9em; /* Slightly smaller font, if needed */
+    padding: 8px 12px; /* Slightly smaller padding */
 }
 
-/* Переопределение цвета для кнопки редактирования, если нужно */
+/* Override color for edit button, if needed */
 .admin-button-group .btn-secondary {
-    background-color: #6c757d; /* Например, серый */
+    background-color: #6c757d; /* For example, gray */
     color: white;
 }
 .admin-button-group .btn-secondary:hover {

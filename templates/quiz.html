@@ -6,9 +6,9 @@
 <header class="header header-compact-padding">
     <div class="container">
         <div class="header-content">
-            <a href="{{ url_for('packs.packs') }}" class="back-link"> {# Изменено на packs.packs #}
+            <a href="{{ url_for('packs.packs') }}" class="back-link">
                 <i class="fas fa-arrow-left"></i>
-                Назад к пакам
+                Back to Packs
             </a>
             <div class="quiz-title">
                 <i class="fas fa-brain"></i>
@@ -24,9 +24,9 @@
     <div class="quiz-container">
         <div class="quiz-progress">
             <div class="progress-info">
-                {# Эти значения будут обновляться JavaScript-ом #}
-                <span id="question-counter">Вопрос 1 из {{ total_questions }}</span>
-                <span id="progress-percentage">Прогресс: 0%</span>
+                {# These values will be updated by JavaScript #}
+                <span id="question-counter">Question 1 of {{ total_questions }}</span>
+                <span id="progress-percentage">Progress: 0%</span>
             </div>
             <div class="progress-bar">
                 <div class="progress-fill" style="width: 0%;"></div>
@@ -35,209 +35,35 @@
 
         <div class="quiz-card">
             <div class="question-header">
-                <h2 id="question-text"></h2> {# Текст вопроса будет вставляться сюда JS #}
+                <h2 id="question-text"></h2> {# Question text will be inserted here by JS #}
                 <div id="question-image-container" style="text-align: center; margin-top: 15px; margin-bottom: 15px;">
-                    {# Изображение будет вставляться сюда JS #}
+                    {# Image will be inserted here by JS #}
                 </div>
             </div>
             <div class="answers-container" id="answers-container">
-                {# Варианты ответов будут динамически вставляться сюда JS #}
+                {# Answer options will be dynamically inserted here by JS #}
             </div>
-            {# Это скрытое поле для хранения ВЫБРАННОГО ответа ТЕКУЩЕГО вопроса #}
+            {# This is a hidden field to store the SELECTED answer of the CURRENT question #}
             <input type="hidden" name="selected_answer" id="selected-answer-input">
 
-            {# Кнопка для перехода к следующему вопросу или завершения квиза #}
+            {# Button to move to the next question or complete the quiz #}
             <button type="button" class="btn btn-primary btn-full" id="next-question-btn" disabled>
-                Следующий вопрос
+                Next Question
             </button>
-            {# Если нужна отдельная кнопка "Завершить квиз", она пока скрыта #}
+            {# If a separate "Finish Quiz" button is needed, it is currently hidden #}
             <button type="button" class="btn btn-secondary btn-full mt-4" id="finish-quiz-btn" style="display: none;">
-                Завершить квиз (резерв)
+                Finish Quiz (backup)
             </button>
         </div>
     </div>
 </div>
 
-{# Скрытый скрипт-тег для передачи данных вопросов в JavaScript.
-   'safe' используется, чтобы Jinja2 не экранировал кавычки в JSON-строке. #}
+{# Hidden script tag to pass question data to JavaScript.
+   'safe' is used so Jinja2 doesn't escape quotes in the JSON string. #}
 <script id="quiz-data" type="application/json">
     {{ questions_data_json | safe }}
 </script>
 
-{# В этом "откате" основной JS-код квиза ЕЩЕ НАХОДИТСЯ ЗДЕСЬ, а не в main.js #}
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const quizDataScript = document.getElementById("quiz-data");
-        if (!quizDataScript) {
-            return; // Не на странице квиза
-        }
-
-        const quizData = JSON.parse(quizDataScript.textContent);
-        const questions = quizData.questions;
-        const packId = quizData.pack_id;
-
-        let currentQuestionIndex = 0;
-        const userAnswers = []; // [{questionId: ID, selectedAnswerIndex: INDEX}, ...]
-        let quizStartTime = Date.now(); // Записываем время начала квиза
-
-        const questionTextElement = document.getElementById("question-text");
-        const questionImageContainer = document.getElementById("question-image-container"); // Новый элемент
-        const answersContainer = document.getElementById("answers-container");
-        const selectedAnswerInput = document.getElementById("selected-answer-input");
-        const nextQuestionBtn = document.getElementById("next-question-btn");
-        const finishQuizBtn = document.getElementById("finish-quiz-btn");
-        const questionCounter = document.getElementById("question-counter");
-        const progressPercentageSpan = document.getElementById("progress-percentage");
-        const progressBarFill = document.querySelector(".progress-bar .progress-fill");
-
-        function renderQuestion() {
-            if (currentQuestionIndex >= questions.length) {
-                showResults();
-                return;
-            }
-
-            const currentQuestion = questions[currentQuestionIndex];
-            questionTextElement.textContent = currentQuestion.question;
-
-            // --- Добавляем логику для отображения изображения ---
-            questionImageContainer.innerHTML = ""; // Очищаем предыдущее изображение
-            if (currentQuestion.image_url) {
-                const img = document.createElement("img");
-                // Убедитесь, что URL для Flask статических файлов формируется правильно.
-                // Если image_url в БД хранится как "/static/path/to/img.jpg"
-                // то нам нужно убрать "/static/" из начала для url_for('static', filename=...)
-                // Если в БД хранится как "path/to/img.jpg", то просто используем
-
-                // В вашем admin.py вы сохраняете его как есть.
-                // Если image_url уже полный путь, например /static/img/...
-                // то для url_for('static', filename=...) нам нужно убрать '/static/'
-                // Например: /static/img/my_image.jpg -> img/my_image.jpg
-                const cleanImageUrl = currentQuestion.image_url.startsWith('/static/') ?
-                                      currentQuestion.image_url.substring(7) :
-                                      currentQuestion.image_url;
-
-                // Теперь используем url_for через fetch, чтобы получить реальный URL от Flask
-                fetch(`/static_url?filename=${encodeURIComponent(cleanImageUrl)}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.url) {
-                            img.src = data.url;
-                            img.alt = "Изображение вопроса";
-                            img.style.maxWidth = "100%"; // Делаем изображение адаптивным
-                            img.style.height = "auto";
-                            img.style.maxHeight = "300px"; // Ограничиваем высоту
-                            questionImageContainer.appendChild(img);
-                        }
-                    })
-                    .catch(error => console.error("Ошибка при получении URL изображения:", error));
-            }
-            // --- Конец логики для отображения изображения ---
-
-            answersContainer.innerHTML = "";
-            currentQuestion.options.forEach((option, index) => {
-                const button = document.createElement("button");
-                button.type = "button";
-                button.classList.add("answer-btn");
-                button.dataset.answerIndex = index;
-                button.dataset.questionId = currentQuestion.id;
-                button.innerHTML = `<span class="answer-letter">${String.fromCharCode(65 + index)}.</span><span class="answer-text">${option}</span>`;
-
-                button.addEventListener("click", () => {
-                    answersContainer.querySelectorAll(".answer-btn").forEach(btn => btn.classList.remove("selected"));
-                    button.classList.add("selected");
-                    selectedAnswerInput.value = button.dataset.answerIndex;
-                    nextQuestionBtn.disabled = false;
-                });
-                answersContainer.appendChild(button);
-            });
-
-            selectedAnswerInput.value = "";
-            nextQuestionBtn.disabled = true;
-
-            updateProgress();
-
-            if (currentQuestionIndex === questions.length - 1) {
-                nextQuestionBtn.textContent = "Завершить квиз";
-            } else {
-                nextQuestionBtn.textContent = "Следующий вопрос";
-            }
-        }
-
-        function updateProgress() {
-            const total = questions.length;
-            const current = currentQuestionIndex;
-            const percentage = total > 0 ? (current / total) * 100 : 0;
-
-            questionCounter.textContent = `Вопрос ${current + 1} из ${total}`;
-            progressPercentageSpan.textContent = `Прогресс: ${percentage.toFixed(0)}%`;
-            progressBarFill.style.width = `${percentage}%`;
-        }
-
-        function showResults() {
-            questionTextElement.textContent = "Квиз завершен! Сохранение результатов...";
-            questionImageContainer.innerHTML = ""; // Очищаем изображение
-            answersContainer.innerHTML = "";
-            nextQuestionBtn.style.display = "none";
-            finishQuizBtn.style.display = "none";
-            selectedAnswerInput.value = "";
-
-            questionCounter.textContent = "Квиз завершен!";
-            progressPercentageSpan.textContent = "Прогресс: 100%";
-            progressBarFill.style.width = "100%";
-
-            submitQuizResults();
-        }
-
-        async function submitQuizResults() {
-            const quizEndTime = Date.now();
-            const totalTimeTaken = (quizEndTime - quizStartTime) / 1000; // Время в секундах
-
-            try {
-                const response = await fetch("{{ url_for('quiz.submit_quiz') }}", { {# Изменено на quiz.submit_quiz #}
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        pack_id: packId,
-                        answers: userAnswers,
-                        totalTimeTaken: totalTimeTaken // Передаем общее время
-                    }),
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    window.location.href = result.redirect_url;
-                } else {
-                    alert(`Ошибка: ${result.message}`);
-                    window.location.href = "{{ url_for('packs.packs') }}"; {# Изменено на packs.packs #}
-                }
-            } catch (error) {
-                console.error("Error submitting quiz:", error);
-                alert("Произошла ошибка при отправке результатов квиза.");
-                window.location.href = "{{ url_for('packs.packs') }}"; {# Изменено на packs.packs #}
-            }
-        }
-
-        nextQuestionBtn.addEventListener("click", () => {
-            const selectedAnswer = selectedAnswerInput.value;
-            const currentQuestion = questions[currentQuestionIndex];
-
-            if (selectedAnswer === "") {
-                return;
-            }
-
-            userAnswers.push({
-                questionId: currentQuestion.id,
-                selectedAnswerIndex: parseInt(selectedAnswer)
-            });
-
-            currentQuestionIndex++;
-            renderQuestion();
-        });
-
-        renderQuestion();
-    });
-</script>
+{# Link to the external quiz.js file #}
+<script src="{{ url_for('static', filename='js/quiz.js') }}"></script>
 {% endblock %}

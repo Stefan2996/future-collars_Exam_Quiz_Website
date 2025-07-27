@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 
-{% block title %}Профиль - QuizMaster{% endblock %}
+{% block title %}Profile - QuizMaster{% endblock %}
 
-{# Здесь мы полностью переопределяем блок 'header' из base.html #}
+{# Here we completely override the 'header' block from base.html #}
 {% block header %}
 <header class="header header-compact-padding">
     <div class="container">
         <div class="header-content">
-            <a href="{{ url_for('packs.packs') }}" class="back-link"> {# Изменено на packs.packs #}
+            <a href="{{ url_for('packs.packs') }}" class="back-link">
                 <i class="fas fa-arrow-left"></i>
-                Назад к пакам
+                Back to Packs
             </a>
             <div class="quiz-title">
                 <i class="fas fa-brain"></i>
-                <span>Профиль</span>
+                <span>Profile</span>
             </div>
         </div>
     </div>
@@ -26,12 +26,12 @@
         <div class="profile-card">
             <div class="user-info">
                 <div class="user-avatar">
-                    {# Используем current_user для отображения первой буквы имени #}
-                    {{ current_user.name[0]|upper if current_user.is_authenticated else '?' }} {# Изменено на current_user #}
+                    {# Use current_user to display the first letter of the name #}
+                    {{ current_user.name[0]|upper if current_user.is_authenticated else '?' }}
                 </div>
                 <div class="user-details">
-                    <h2>{{ current_user.name if current_user.is_authenticated else 'Гость' }}</h2> {# Изменено на current_user #}
-                    <p><i class="fas fa-envelope"></i> {{ current_user.email if current_user.is_authenticated else 'N/A' }}</p> {# Изменено на current_user #}
+                    <h2>{{ current_user.name if current_user.is_authenticated else 'Guest' }}</h2>
+                    <p><i class="fas fa-envelope"></i> {{ current_user.email if current_user.is_authenticated else 'N/A' }}</p>
                 </div>
             </div>
         </div>
@@ -42,8 +42,8 @@
                     <i class="fas fa-check-circle"></i>
                 </div>
                 <div class="stat-content">
-                    <h3>Правильных ответов</h3>
-                    {# Используем переменную correct_answers, переданную из app.py #}
+                    <h3>Correct Answers</h3>
+                    {# Use the correct_answers variable passed from app.py #}
                     <p class="stat-number">{{ correct_answers }}</p>
                 </div>
             </div>
@@ -52,8 +52,8 @@
                     <i class="fas fa-question-circle"></i>
                 </div>
                 <div class="stat-content">
-                    <h3>Всего вопросов</h3>
-                    {# Используем переменную total_questions, переданную из app.py #}
+                    <h3>Total Questions</h3>
+                    {# Use the total_questions variable passed from app.py #}
                     <p class="stat-number">{{ total_questions }}</p>
                 </div>
             </div>
@@ -62,9 +62,9 @@
                     <i class="fas fa-percentage"></i>
                 </div>
                 <div class="stat-content">
-                    <h3>Процент верных</h3>
+                    <h3>Correct Percentage</h3>
                     <p class="stat-number">
-                        {# Вычисляем процент на основе total_questions и correct_answers #}
+                        {# Calculate percentage based on total_questions and correct_answers #}
                         {% if total_questions > 0 %}
                             {% set overall_accuracy = (correct_answers / total_questions) * 100 %}
                             {{ "%.1f" | format(overall_accuracy) }}%
@@ -77,11 +77,10 @@
             </div>
         </div>
 
-        {# Новый блок "Статистика по пакам" #}
         <div class="card profile-card">
             <div class="card-header">
-                <h2 class="card-title">Статистика по пакам</h2>
-                <p class="card-description">Пройдено паков: {{ pack_stats|length }}</p>
+                <h2 class="card-title">Pack Statistics</h2>
+                <p class="card-description">Packs completed: {{ pack_stats|length }}</p>
             </div>
             <div class="card-content">
                 {% if pack_stats|length > 0 %}
@@ -96,28 +95,28 @@
                             <div class="pack-stat-item">
                                 <div class="pack-stat-header">
                                     <h3 class="pack-title">{{ stats.pack_title }}</h3>
-                                    <span class="badge">{{ stats.attempts }} попыток</span>
+                                    <span class="badge">{{ stats.attempts }} attempts</span>
                                 </div>
 
                                 <div class="pack-details-grid">
                                     <div>
-                                        <p class="detail-label">Лучший результат</p>
+                                        <p class="detail-label">Best Score</p>
                                         <p class="detail-value">
                                             {{ stats.best_score }}/{{ stats.total_questions_in_pack }}
                                         </p>
                                     </div>
                                     <div>
-                                        <p class="detail-label">Последний результат</p>
+                                        <p class="detail-label">Last Score</p>
                                         <p class="detail-value">
                                             {{ stats.last_score }}/{{ stats.total_questions_in_pack }}
                                         </p>
                                     </div>
                                     <div>
-                                        <p class="detail-label">Лучшая точность</p>
+                                        <p class="detail-label">Best Accuracy</p>
                                         <p class="detail-value">{{ best_accuracy }}%</p>
                                     </div>
                                     <div>
-                                        <p class="detail-label">Прогресс</p>
+                                        <p class="detail-label">Progress</p>
                                         <div class="progress-bar-container">
                                             <div class="progress-bar-fill" style="width: {{ best_accuracy }}%;"></div>
                                         </div>
@@ -129,9 +128,9 @@
                 {% else %}
                     <div class="empty-state">
                         <i class="fas fa-trophy icon-large"></i>
-                        <p class="empty-state-text">Вы еще не прошли ни одного квиза</p>
-                        <a href="{{ url_for('packs.packs') }}" class="btn btn-primary"> {# Изменено на packs.packs #}
-                            Начать первый квиз
+                        <p class="empty-state-text">You haven't completed any quizzes yet</p>
+                        <a href="{{ url_for('packs.packs') }}" class="btn btn-primary">
+                            Start your first quiz
                         </a>
                     </div>
                 {% endif %}
@@ -141,88 +140,88 @@
         {# Achievements Block #}
         <div class="achievements-card profile-card">
             <div class="card-header">
-                <h3 class="card-title">Ваши достижения</h3>
-                <p class="card-description">Награды за ваши успехи в квизах.</p>
+                <h3 class="card-title">Your Achievements</h3>
+                <p class="card-description">Awards for your quiz successes.</p>
             </div>
             <div class="card-content">
                 <div class="achievements-grid">
-                    {# Достижение 1: Новичок (Ответить на 10 вопросов) #}
+                    {# Achievement 1: Novice (Answer 10 questions) #}
                     {% set novice_unlocked = total_questions >= 10 %}
                     <div class="achievement {% if novice_unlocked %}unlocked{% endif %} achievement-yellow">
                         <i class="fas fa-trophy achievement-icon {% if novice_unlocked %}unlocked-icon{% endif %}"></i>
                         <div class="achievement-info">
-                            <h4>Новичок</h4>
-                            <p>Ответить на 10 вопросов</p>
+                            <h4>Novice</h4>
+                            <p>Answer 10 questions</p>
                         </div>
                     </div>
 
-                    {# Достижение 2: Меткий стрелок (80% точность) #}
+                    {# Achievement 2: Sharpshooter (80% accuracy) #}
                     {% set sharpshooter_unlocked = overall_accuracy >= 80 %}
                     <div class="achievement {% if sharpshooter_unlocked %}unlocked{% endif %} achievement-green">
                         <i class="fas fa-bullseye achievement-icon {% if sharpshooter_unlocked %}unlocked-icon{% endif %}"></i>
                         <div class="achievement-info">
-                            <h4>Меткий стрелок</h4>
-                            <p>80% точность</p>
+                            <h4>Sharpshooter</h4>
+                            <p>80% accuracy</p>
                         </div>
                     </div>
 
-                    {# Достижение 3: Эрудит (Пройти 3 разных пака) #}
+                    {# Achievement 3: Erudite (Complete 3 different packs) #}
                     {% set erudite_unlocked = pack_stats|length >= 3 %}
                     <div class="achievement {% if erudite_unlocked %}unlocked{% endif %} achievement-purple">
                         <i class="fas fa-brain achievement-icon {% if erudite_unlocked %}unlocked-icon{% endif %}"></i>
                         <div class="achievement-info">
-                            <h4>Эрудит</h4>
-                            <p>Пройти 3 разных пака</p>
+                            <h4>Erudite</h4>
+                            <p>Complete 3 different packs</p>
                         </div>
                     </div>
 
-                    {# Достижение 4: Знаток (Ответить на 50 вопросов) #}
+                    {# Achievement 4: Expert (Answer 50 questions) #}
                     {% set expert_unlocked = total_questions >= 50 %}
                     <div class="achievement {% if expert_unlocked %}unlocked{% endif %} achievement-blue">
                         <i class="fas fa-graduation-cap achievement-icon {% if expert_unlocked %}unlocked-icon{% endif %}"></i>
                         <div class="achievement-info">
-                            <h4>Знаток</h4>
-                            <p>Ответить на 50 вопросов</p>
+                            <h4>Expert</h4>
+                            <p>Answer 50 questions</p>
                         </div>
                     </div>
 
-                    {# Достижение 5: Упорный ученик (Пройти 10 квизов) #}
+                    {# Achievement 5: Persistent Student (Complete 10 quizzes) #}
                     {% set persistent_student_unlocked = total_quizzes_completed >= 10 %}
                     <div class="achievement {% if persistent_student_unlocked %}unlocked{% endif %} achievement-orange">
                         <i class="fas fa-book-reader achievement-icon {% if persistent_student_unlocked %}unlocked-icon{% endif %}"></i>
                         <div class="achievement-info">
-                            <h4>Упорный ученик</h4>
-                            <p>Пройти 10 квизов</p>
+                            <h4>Persistent Student</h4>
+                            <p>Complete 10 quizzes</p>
                         </div>
                     </div>
 
-                    {# Достижение 6: Повелитель паков (Пройти 5 разных паков) #}
+                    {# Achievement 6: Pack Master (Complete 5 different packs) #}
                     {% set pack_master_unlocked = pack_stats|length >= 5 %}
                     <div class="achievement {% if pack_master_unlocked %}unlocked{% endif %} achievement-amber">
                         <i class="fas fa-globe-americas achievement-icon {% if pack_master_unlocked %}unlocked-icon{% endif %}"></i>
                         <div class="achievement-info">
-                            <h4>Повелитель паков</h4>
-                            <p>Пройти 5 разных паков</p>
+                            <h4>Pack Master</h4>
+                            <p>Complete 5 different packs</p>
                         </div>
                     </div>
 
-                    {# Достижение 7: Безошибочный (Пройти квиз со 100% точностью, мин. 5 вопросов) #}
+                    {# Achievement 7: Flawless (Complete a quiz with 100% accuracy, min. 5 questions) #}
                     {% set flawless_unlocked = has_flawless_quiz %}
                     <div class="achievement {% if flawless_unlocked %}unlocked{% endif %} achievement-red">
                         <i class="fas fa-check-double achievement-icon {% if flawless_unlocked %}unlocked-icon{% endif %}"></i>
                         <div class="achievement-info">
-                            <h4>Безошибочный</h4>
-                            <p>Пройти квиз со 100% точностью</p>
+                            <h4>Flawless</h4>
+                            <p>Complete a quiz with 100% accuracy</p>
                         </div>
                     </div>
 
-                    {# Достижение 8: Скорострел (Среднее время ответа < 3с, 80%+ точность, мин. 5 вопросов) #}
+                    {# Achievement 8: Quickdraw (Average response time < 3s, 80%+ accuracy, min. 5 questions) #}
                     {% set sharpshooter_speed_unlocked = has_sharpshooter_speed_quiz %}
                     <div class="achievement {% if sharpshooter_speed_unlocked %}unlocked{% endif %} achievement-teal">
                         <i class="fas fa-bolt achievement-icon {% if sharpshooter_speed_unlocked %}unlocked-icon{% endif %}"></i>
                         <div class="achievement-info">
-                            <h4>Скорострел</h4>
-                            <p>Квиз со средней скоростью < 3 секунд и 80%+ точностью</p>
+                            <h4>Quickdraw</h4>
+                            <p>Quiz with average speed < 3 seconds and 80%+ accuracy</p>
                         </div>
                     </div>
 

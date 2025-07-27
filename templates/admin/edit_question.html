@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}Редактировать Вопрос{% endblock %}
+{% block title %}Edit Question{% endblock %}
 
 {% block content %}
-    <div class="panel">
+    <div class="container">
         <div class="panel-header text-center">
-            <div class="panel-title h5 mt-10">Редактировать Вопрос для "{{ quiz_pack.title }}"</div>
+            <div class="panel-title h5 mt-10">Edit Question for "{{ quiz_pack.title }}"</div>
         </div>
         <div class="panel-body">
             <form action="{{ url_for('admin.edit_question', question_id=question.id) }}" method="POST" class="form-horizontal">
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
-                        <label class="form-label" for="question_text">Текст вопроса</label>
+                        <label class="form-label" for="question_text">Question Text</label>
                     </div>
                     <div class="col-9 col-sm-12">
                         <textarea class="form-input" id="question_text" name="question_text" required>{{ question.question_text }} </textarea>
@@ -19,18 +19,18 @@
                 </div>
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
-                        <label class="form-label" for="image_url">URL картинки (необязательно)</label>
+                        <label class="form-label" for="image_url">Image URL (optional)</label>
                     </div>
                     <div class="col-9 col-sm-12">
-                        <input class="form-input" type="text" id="image_url" name="image_url" value="{{ question.image_url if question.image_url else '' }}" placeholder="Например, /static/img/HarryPotter/1pack/вопрос1.jpg">
-                        <p class="form-input-hint">Используйте URL картинки. Для локальных картинок: /static/ваш_файл.jpg</p>
+                        <input class="form-input" type="text" id="image_url" name="image_url" value="{{ question.image_url if question.image_url else '' }}" placeholder="E.g., /static/img/HarryPotter/1pack/question1.jpg">
+                        <p class="form-input-hint">Use image URL. For local images: /static/your_file.jpg</p>
                     </div>
                 </div>
-                <div class="divider text-center" data-content="Варианты Ответов"></div>
-                {# Изменены имена полей для вариантов ответа #}
+                <div class="divider text-center" data-content="Answer Options"></div>
+                {# Changed field names for answer options #}
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
-                        <label class="form-label" for="option_0">Вариант A</label>
+                        <label class="form-label" for="option_0">Option A</label>
                     </div>
                     <div class="col-9 col-sm-12">
                         <input class="form-input" type="text" id="option_0" name="option_0" value="{{ options[0] if options[0] is defined else '' }}" required>
@@ -38,7 +38,7 @@
                 </div>
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
-                        <label class="form-label" for="option_1">Вариант B</label>
+                        <label class="form-label" for="option_1">Option B</label>
                     </div>
                     <div class="col-9 col-sm-12">
                         <input class="form-input" type="text" id="option_1" name="option_1" value="{{ options[1] if options[1] is defined else '' }}" required>
@@ -46,7 +46,7 @@
                 </div>
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
-                        <label class="form-label" for="option_2">Вариант C</label>
+                        <label class="form-label" for="option_2">Option C</label>
                     </div>
                     <div class="col-9 col-sm-12">
                         <input class="form-input" type="text" id="option_2" name="option_2" value="{{ options[2] if options[2] is defined else '' }}" required>
@@ -54,7 +54,7 @@
                 </div>
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
-                        <label class="form-label" for="option_3">Вариант D</label>
+                        <label class="form-label" for="option_3">Option D</label>
                     </div>
                     <div class="col-9 col-sm-12">
                         <input class="form-input" type="text" id="option_3" name="option_3" value="{{ options[3] if options[3] is defined else '' }}" required>
@@ -62,21 +62,21 @@
                 </div>
                 <div class="form-group">
                     <div class="col-3 col-sm-12">
-                        <label class="form-label" for="correct_answer">Правильный ответ (A, B, C, D)</label>
+                        <label class="form-label" for="correct_answer">Correct Answer (A, B, C, D)</label>
                     </div>
                     <div class="col-9 col-sm-12">
-                        <input class="form-input" type="text" id="correct_answer" name="correct_answer" pattern="[ABCDabcd]" title="Введите A, B, C или D" value="{{ question.correct_answer if question.correct_answer is defined else '' }}" required>
+                        <input class="form-input" type="text" id="correct_answer" name="correct_answer" pattern="[ABCDabcd]" title="Enter A, B, C or D" value="{{ question.correct_answer if question.correct_answer is defined else '' }}" required>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
                     </div>
                 </div>
             </form>
         </div>
         <div class="panel-footer text-center">
-            <a href="{{ url_for('admin.add_question', quiz_id=quiz_pack.id) }}" class="btn btn-primary">Вернуться к вопросам квиз-пака</a>
+            <a href="{{ url_for('admin.add_question', quiz_id=quiz_pack.id) }}" class="btn btn-primary">Back to Quiz Pack Questions</a>
         </div>
     </div>
 {% endblock %}

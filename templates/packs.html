@@ -1,22 +1,22 @@
 {% extends "base.html" %}
 
-{% block title %}Паки вопросов - QuizMaster{% endblock %}
+{% block title %}Quiz Packs - QuizMaster{% endblock %}
 
 {% block content %}
 <div class="packs-bg">
     <div class="container">
         <div class="page-header">
-            <h1>Выберите пак вопросов</h1>
-            <p>Проверьте свои знания в различных областях</p>
+            <h1>Select a Quiz Pack</h1>
+            <p>Test your knowledge in various fields</p>
         </div>
         <div class="packs-grid">
             {% for pack in packs %}
-            <div class="pack-card"> {# Основная карточка для флексбокса #}
-                <div class="pack-content"> {# Оборачиваем весь контент, кроме футера, для гибкости #}
+            <div class="pack-card"> {# Main card for flexbox #}
+                <div class="pack-content"> {# Wrap all content except footer for flexibility #}
                     <div class="pack-header">
                         <div class="pack-indicator {{ pack.color }}"></div>
                         <div class="difficulty-badge difficulty-{{ pack.difficulty }}">
-                            {{ pack.difficulty }}
+                            {{ pack.difficulty }} {# This will display Easy, Medium, Hard, Expert #}
                         </div>
                     </div>
                     <h3>{{ pack.title }}</h3>
@@ -24,20 +24,20 @@
                     <div class="pack-info">
                         <div class="pack-stat">
                             <i class="fas fa-question-circle"></i>
-                            {{ pack.questions | length }} вопросов
+                            {{ pack.questions | length }} questions
                         </div>
                         <div class="pack-stat">
                             <i class="fas fa-clock"></i>
-                            ~{{ pack.time_to_complete_minutes }} мин
+                            ~{{ pack.time_to_complete_minutes }} min
                         </div>
                     </div>
-                </div> {# Конец pack-content #}
-                <div class="pack-footer"> {# Футер для кнопки #}
+                </div> {# End pack-content #}
+                <div class="pack-footer"> {# Footer for the button #}
                     <a href="{{ url_for('quiz.quiz', pack_id=pack.id) }}" class="btn btn-primary btn-full">
-                        Начать квиз
+                        Start Quiz
                     </a>
                 </div>
-            </div> {# Конец pack-card #}
+            </div> {# End pack-card #}
             {% endfor %}
         </div>
 
@@ -45,11 +45,11 @@
         <div class="user-stats-card">
             <div class="stats-content">
                 <i class="fas fa-trophy"></i>
-                <h3>Ваша статистика</h3>
-                <p>Правильных ответов: {{ user_stats.total_correct_answers }} из {{ user_stats.total_questions_answered }}</p>
-                <p>Завершено квизов: {{ user_stats.total_games_played }}</p>
+                <h3>Your Statistics</h3>
+                <p>Correct answers: {{ user_stats.total_correct_answers }} out of {{ user_stats.total_questions_answered }}</p>
+                <p>Quizzes completed: {{ user_stats.total_games_played }}</p>
                 <a href="{{ url_for('auth.profile') }}" class="btn btn-secondary">
-                    Подробная статистика
+                    Detailed Statistics
                 </a>
             </div>
         </div>

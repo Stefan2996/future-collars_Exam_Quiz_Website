@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Регистрация - QuizMaster{% endblock %}
+{% block title %}Register - QuizMaster{% endblock %}
 
 {% block content %}
 <div class="auth-bg">
@@ -10,14 +10,14 @@
                 <div class="auth-icon">
                     <i class="fas fa-brain"></i>
                 </div>
-                <h2>Регистрация</h2>
-                <p>Создайте аккаунт для участия в квизах</p>
+                <h2>Register</h2>
+                <p>Create an account to participate in quizzes</p>
             </div>
 
             <form method="POST" class="auth-form">
                 <div class="form-group">
-                    <label for="name">Имя</label>
-                    <input type="text" id="name" name="name" placeholder="Ваше имя" required>
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" placeholder="Your name" required>
                 </div>
 
                 <div class="form-group">
@@ -26,9 +26,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Пароль</label>
+                    <label for="password">Password</label>
                     <div class="password-input">
-                        <input type="password" id="password" name="password" placeholder="Создайте пароль" required>
+                        <input type="password" id="password" name="password" placeholder="Create a password" required>
                         <button type="button" class="password-toggle" onclick="togglePassword('password')">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -36,16 +36,16 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="confirm_password">Подтвердите пароль</label>
-                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Повторите пароль" required>
+                    <label for="confirm_password">Confirm Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Repeat password" required>
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-full">Зарегистрироваться</button>
+                <button type="submit" class="btn btn-primary btn-full">Register</button>
             </form>
 
             <div class="auth-footer">
-                <p>Уже есть аккаунт? <a href="{{ url_for('auth.login') }}">Войти</a></p> {# Изменено на auth.login #}
-                <a href="{{ url_for('index') }}" class="back-link">← Вернуться на главную</a>
+                <p>Already have an account? <a href="{{ url_for('auth.login') }}">Login</a></p>
+                <a href="{{ url_for('index') }}" class="back-link">← Back to home</a>
             </div>
         </div>
     </div>

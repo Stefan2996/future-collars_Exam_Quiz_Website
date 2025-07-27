@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,16 +21,15 @@
         {% endwith %}
     </div>
 
-    {# Включаем общий хедер здесь, как дефолтный #}
+    {# Include the general header here, as default #}
     {% block header %}
         {% include '_header.html' %}
     {% endblock %}
 
-    <main class="content-wrapper"> {# <-- Добавляем контейнер для основного контента #}
+    <main class="content-wrapper">
         {% block content %}{% endblock %}
     </main>
 
-    {# Футер теперь находится здесь, вне блока content, чтобы быть на всех страницах #}
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
@@ -38,7 +37,7 @@
                     <i class="fas fa-brain"></i>
                     <span>QuizMaster</span>
                 </div>
-                <p>&copy; 2025 QuizMaster. Все права защищены.</p>
+                <p>&copy; 2025 QuizMaster. All rights reserved.</p>
             </div>
         </div>
     </footer>

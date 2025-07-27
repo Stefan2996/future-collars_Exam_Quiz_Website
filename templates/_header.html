@@ -6,17 +6,17 @@
                     <span>QuizMaster</span>
                 </a>
                 <div class="header-actions">
-                    {% if current_user.is_authenticated %} {# Используем current_user из Flask-Login #}
-                        <a href="{{ url_for('auth.profile') }}" class="btn btn-outline"> {# Изменено на auth.profile #}
+                    {% if current_user.is_authenticated %} {# Using current_user from Flask-Login #}
+                        <a href="{{ url_for('auth.profile') }}" class="btn btn-outline">
                             <i class="fas fa-user"></i>
-                            {{ current_user.name }} {# Используем current_user.name #}
+                            {{ current_user.name }} {# Using current_user.name #}
                         </a>
-                        <a href="{{ url_for('auth.logout') }}" class="btn btn-ghost btn-icon-logout"> {# Изменено на auth.logout #}
+                        <a href="{{ url_for('auth.logout') }}" class="btn btn-ghost btn-icon-logout">
                             <i class="fas fa-sign-out-alt"></i>
                         </a>
                     {% else %}
-                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Войти</a>
-                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Регистрация</a> {# Изменено на auth.register #}
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Login</a>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Register</a>
                     {% endif %}
                 </div>
             </div>

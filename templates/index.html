@@ -6,20 +6,20 @@
         <div class="container">
             <div class="hero-content">
                 <h1 class="hero-title">
-                    Проверь свои знания с
+                    Test your knowledge with
                     <span class="gradient-text">QuizMaster</span>
                 </h1>
                 <p class="hero-description">
-                    Увлекательные квизы по различным темам. Соревнуйся с друзьями, отслеживай прогресс и становись экспертом!
+                    Engaging quizzes on various topics. Compete with friends, track your progress, and become an expert!
                 </p>
                 <div class="hero-buttons">
                     <a href="{{ url_for('packs.packs') }}" class="btn btn-primary btn-large">
                         <i class="fas fa-bolt"></i>
-                        Начать игру
+                        Start Game
                     </a>
-                    {% if not current_user.is_authenticated %} {# ИСПРАВЛЕНО: 'g.user' -> 'current_user.is_authenticated' #}
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline btn-large"> {# ИСПРАВЛЕНО: 'register' -> 'auth.register' #}
-                        Создать аккаунт
+                    {% if not current_user.is_authenticated %} {# FIXED: 'g.user' -> 'current_user.is_authenticated' #}
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline btn-large"> {# FIXED: 'register' -> 'auth.register' #}
+                        Create Account
                     </a>
                     {% endif %}
                 </div>
@@ -34,22 +34,22 @@
                     <div class="feature-icon purple">
                         <i class="fas fa-brain"></i>
                     </div>
-                    <h3>Разнообразные темы</h3>
-                    <p>История, наука, спорт, культура и многое другое. Найди свою любимую тему!</p>
+                    <h3>Diverse Topics</h3>
+                    <p>History, science, sports, culture, and much more. Find your favorite topic!</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon blue">
                         <i class="fas fa-trophy"></i>
                     </div>
-                    <h3>Система достижений</h3>
-                    <p>Отслеживай свой прогресс, получай награды и поднимайся в рейтинге.</p>
+                    <h3>Achievement System</h3>
+                    <p>Track your progress, earn rewards, and climb the ranks.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon green">
                         <i class="fas fa-users"></i>
                     </div>
-                    <h3>Соревнования</h3>
-                    <p>Соревнуйся с друзьями и другими игроками со всего мира.</p>
+                    <h3>Competitions</h3>
+                    <p>Compete with friends and other players from around the world.</p>
                 </div>
             </div>
         </div>
@@ -59,24 +59,23 @@
     <section class="cta">
         <div class="container">
             <div class="cta-card">
-                <h2>Готов принять вызов?</h2>
-                <p>Присоединяйся к тысячам игроков уже сейчас!</p>
+                <h2>Ready to take the challenge?</h2>
+                <p>Join thousands of players now!</p>
                 <a href="{{ url_for('auth.register') }}" class="btn btn-secondary btn-large">
-                    Начать прямо сейчас
+                    Get Started Now
                 </a>
             </div>
         </div>
     </section>
     {% else %}
-    {# Здесь будет контент для залогиненного пользователя #}
-    <section class="cta cta-logged-in"> {# Можно добавить отдельный класс для стилизации #}
+    <section class="cta cta-logged-in">
         <div class="container">
             <div class="cta-card">
-                <h2>Продолжай совершенствоваться, {{ current_user.name }}!</h2> {# Пример использования имени пользователя #}
-                <p>Ваши знания — ваша сила. Приготовьтесь к новым вызовам!</p>
+                <h2>Keep improving, {{ current_user.name }}!</h2>
+                <p>Your knowledge is your power. Get ready for new challenges!</p>
                 <a href="{{ url_for('packs.packs') }}" class="btn btn-secondary btn-large">
                     <i class="fas fa-arrow-right"></i>
-                    Перейти к квизам
+                    Go to Quizzes
                 </a>
             </div>
         </div>

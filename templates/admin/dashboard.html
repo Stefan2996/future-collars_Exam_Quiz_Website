@@ -1,65 +1,65 @@
 {% extends "base.html" %}
 
-{% block title %}Админ-панель{% endblock %}
+{% block title %}Admin Panel{% endblock %}
 
 {% block content %}
-<div class="packs-bg"> {# Используем packs-bg для единообразия фона и отступов #}
+<div class="packs-bg">
     <div class="container">
-        <div class="page-header"> {# Используем page-header для заголовка #}
-            <h1>Управление Квиз-Паками</h1>
-            <p>Создавайте, редактируйте и удаляйте квиз-паки и вопросы</p>
+        <div class="page-header">
+            <h1>Quiz Pack Management</h1>
+            <p>Create, edit, and delete quiz packs and questions</p>
         </div>
 
         <div class="text-center mb-4">
             <a href="{{ url_for('admin.new_quiz_pack') }}" class="btn btn-primary btn-lg">
-                <i class="fas fa-plus-circle mr-1"></i> Создать новый квиз-пак
+                <i class="fas fa-plus-circle mr-1"></i> Create New Quiz Pack
             </a>
         </div>
 
         {% if quiz_packs %}
-            <div class="packs-grid"> {# Используем packs-grid для той же адаптивной сетки #}
+            <div class="packs-grid"> {# Using packs-grid for the same responsive grid #}
                 {% for pack in quiz_packs %}
-                    <div class="pack-card"> {# Копируем структуру pack-card #}
-                        <div class="pack-content"> {# Оборачиваем весь контент, кроме футера #}
+                    <div class="pack-card"> {# Copying pack-card structure #}
+                        <div class="pack-content"> {# Wrapping all content except the footer #}
                             <div class="pack-header">
                                 <div class="pack-indicator {{ pack.color }}"></div>
-                                <div class="difficulty-badge difficulty-{{ pack.difficulty }}"> {# Проверьте регистр, если надо .lower() #}
+                                <div class="difficulty-badge difficulty-{{ pack.difficulty }}">
                                     {{ pack.difficulty }}
                                 </div>
                             </div>
                             <h3>{{ pack.title }}</h3>
-                            <p class="pack-description">{{ pack.description }}</p> {# Класс для выравнивания #}
+                            <p class="pack-description">{{ pack.description }}</p> {# Class for alignment #}
                             <div class="pack-info">
                                 <div class="pack-stat">
                                     <i class="fas fa-question-circle"></i>
-                                    {{ pack.questions | length }} вопросов
+                                    {{ pack.questions | length }} questions
                                 </div>
                                 <div class="pack-stat">
                                     <i class="fas fa-clock"></i>
-                                    ~{{ pack.time_to_complete_minutes }} мин
+                                    ~{{ pack.time_to_complete_minutes }} min
                                 </div>
                             </div>
-                        </div> {# Конец pack-content #}
-                        <div class="pack-footer admin-pack-footer"> {# НОВЫЙ КЛАСС для стилизации футера админа #}
-                            <div class="admin-button-group"> {# Группа для кнопок админа #}
+                        </div>
+                        <div class="pack-footer admin-pack-footer">
+                            <div class="admin-button-group">
                                 <a href="{{ url_for('admin.add_question', quiz_id=pack.id) }}" class="btn btn-primary btn-full admin-btn-action">
                                     <i class="fas fa-plus mr-1"></i> Add / Edit Question
                                 </a>
                                 <a href="{{ url_for('admin.edit_quiz_pack', quiz_id=pack.id) }}" class="btn btn-secondary btn-full admin-btn-action">
-                                    <i class="fas fa-edit mr-1"></i> Редактировать пак
+                                    <i class="fas fa-edit mr-1"></i> Edit Pack
                                 </a>
-                                <form action="{{ url_for('admin.delete_quiz_pack', quiz_id=pack.id) }}" method="POST" onsubmit="return confirm('Вы уверены, что хотите удалить квиз-пак &quot;{{ pack.title }}&quot; и все его вопросы/статистику?');">
+                                <form action="{{ url_for('admin.delete_quiz_pack', quiz_id=pack.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete the quiz pack &quot;{{ pack.title }}&quot; and all its questions/statistics?');">
                                     <button type="submit" class="btn btn-error btn-full admin-btn-action">
-                                        <i class="fas fa-trash-alt mr-1"></i> Удалить
+                                        <i class="fas fa-trash-alt mr-1"></i> Delete
                                     </button>
                                 </form>
                             </div>
                         </div>
-                    </div> {# Конец pack-card #}
+                    </div>
                 {% endfor %}
             </div>
         {% else %}
-            <p class="empty-state text-center mt-4">Пока нет созданных квиз-паков. Начните с создания первого!</p>
+            <p class="empty-state text-center mt-4">No quiz packs created yet. Start by creating the first one!</p>
         {% endif %}
     </div>
 </div>
